@@ -1,0 +1,33 @@
+{
+  "annotations": {
+    "changelogDate": "20251212203428"
+  },
+  "applications": "*",
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "nombre",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "apellido",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "identificacion",
+      "fieldType": "String"
+    }
+  ],
+  "name": "Integrante",
+  "relationships": [
+    {
+      "otherEntityName": "evento",
+      "otherEntityRelationshipName": "integrantes",
+      "relationshipName": "evento",
+      "relationshipSide": "right",
+      "relationshipType": "many-to-one"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}

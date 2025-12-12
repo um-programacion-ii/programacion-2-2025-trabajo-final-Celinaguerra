@@ -83,6 +83,13 @@ public class CacheConfiguration {
             createCache(cm, com.celi.backend.domain.User.class.getName(), jcacheConfiguration);
             createCache(cm, com.celi.backend.domain.Authority.class.getName(), jcacheConfiguration);
             createCache(cm, com.celi.backend.domain.User.class.getName() + ".authorities", jcacheConfiguration);
+            createCache(cm, com.celi.backend.domain.Evento.class.getName(), jcacheConfiguration);
+            createCache(cm, com.celi.backend.domain.Evento.class.getName() + ".integrantes", jcacheConfiguration);
+            createCache(cm, com.celi.backend.domain.TipoEvento.class.getName(), jcacheConfiguration);
+            createCache(cm, com.celi.backend.domain.Integrante.class.getName(), jcacheConfiguration);
+            createCache(cm, com.celi.backend.domain.Venta.class.getName(), jcacheConfiguration);
+            createCache(cm, com.celi.backend.domain.Venta.class.getName() + ".asientos", jcacheConfiguration);
+            createCache(cm, com.celi.backend.domain.Asiento.class.getName(), jcacheConfiguration);
             // jhipster-needle-redis-add-entry
         };
     }
