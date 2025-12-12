@@ -1,0 +1,68 @@
+entity Evento {
+  titulo String required,
+  resumen String,
+  descripcion TextBlob,
+  fecha Instant required,
+  direccion String,
+  imagen String,
+  filaAsientos Integer,
+  columnAsientos Integer,
+  precioEntrada Double required
+}
+
+// Sub-objeto de Evento (Payload 3, 4, 5)
+entity TipoEvento {
+  nombre String,
+  descripcion String
+}
+
+// Sub-objeto de Evento (Payload 4, 5)
+entity Integrante {
+  nombre String,
+  apellido String,
+  identificacion String
+}
+
+// --- Entidad VENTA (Payloads 7, 8, 9) ---
+entity Venta {
+  ventaIdCatedra Long,
+  fechaVenta Instant required,
+  precioVenta Double required,
+  resultado Boolean,
+  descripcion String,
+  cantidadAsientos Integer
+}
+
+enum EstadoAsiento {
+  LIBRE,
+  BLOQUEADO,
+  VENDIDO,
+  OCUPADO
+}
+
+// --- Entidad ASIENTO / TICKET (Payload 6, 7, 9) ---
+entity Asiento {
+  fila Integer required,
+  columna Integer required,
+  persona String,
+  estado EstadoAsiento
+}
+
+// ==========================================
+// RELACIONES
+// ==========================================
+
+relationship ManyToOne {
+  Evento{eventoTipo(nombre)} to TipoEvento
+  Venta{user(login)} to User with builtInEntity
+  Venta{evento(titulo)} to Evento
+}
+
+relationship OneToMany {
+  Evento{integrantes} to Integrante{evento}
+  Venta{asientos} to Asiento{venta}
+}
+
+dto * with mapstruct
+service all with serviceClass
+paginate Evento, Venta with pagination

@@ -1,0 +1,21 @@
+{
+  "annotations": {
+    "changelogDate": "20251212203427"
+  },
+  "applications": "*",
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "nombre",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "descripcion",
+      "fieldType": "String"
+    }
+  ],
+  "name": "TipoEvento",
+  "relationships": [],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}

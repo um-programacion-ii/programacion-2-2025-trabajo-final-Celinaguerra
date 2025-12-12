@@ -1,0 +1,68 @@
+{
+  "annotations": {
+    "changelogDate": "20251212203426"
+  },
+  "applications": "*",
+  "dto": "mapstruct",
+  "fields": [
+    {
+      "fieldName": "titulo",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "resumen",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "descripcion",
+      "fieldType": "TextBlob"
+    },
+    {
+      "fieldName": "fecha",
+      "fieldType": "Instant",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "direccion",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "imagen",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "filaAsientos",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "columnAsientos",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "precioEntrada",
+      "fieldType": "Double",
+      "fieldValidateRules": ["required"]
+    }
+  ],
+  "name": "Evento",
+  "pagination": "pagination",
+  "relationships": [
+    {
+      "otherEntityName": "integrante",
+      "otherEntityRelationshipName": "evento",
+      "relationshipName": "integrantes",
+      "relationshipSide": "left",
+      "relationshipType": "one-to-many"
+    },
+    {
+      "otherEntityField": "nombre",
+      "otherEntityName": "tipoEvento",
+      "relationshipName": "eventoTipo",
+      "relationshipSide": "left",
+      "relationshipType": "many-to-one"
+    }
+  ],
+  "searchEngine": "no",
+  "service": "serviceClass"
+}
