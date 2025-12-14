@@ -95,7 +95,7 @@ jhipster:
   cache: # Cache configuration
     redis: # Redis configuration
       expiration: 3600 # By default objects stay 1 hour (in seconds) in the cache
-      server: redis://localhost:6379
+      server: ${SPRING_DATA_REDIS_URL:redis://192.168.194.250:6379}
       cluster: false
       # server: redis://localhost:6379,redis://localhost:16379,redis://localhost:26379
       # cluster: true
@@ -130,3 +130,7 @@ jhipster:
 # ===================================================================
 
 # application:
+application:
+  catedra:
+    url: ${CATEDRA_URL:http://192.168.194.250:8080/api}
+    token: ${CATEDRA_TOKEN:eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJjZWxpIiwiZXhwIjoxODUyMTQ3OTczLCJhdXRoIjoiUk9MRV9VU0VSIiwiaWF0IjoxNzY1NzQ3OTczfQ.M4FqYHOwZlDolP-_GYdRtfHR0Jwejq_JaIrhtGoSYAzUhihaDJaXN0cbOa-57y_r45J1Bu3zgaaS2NnI0JChOQ}

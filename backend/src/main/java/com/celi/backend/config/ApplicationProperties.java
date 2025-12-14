@@ -13,6 +13,12 @@ public class ApplicationProperties {
 
     private final Liquibase liquibase = new Liquibase();
 
+    private final Catedra catedra = new Catedra();
+
+    public Catedra getCatedra() {
+        return catedra;
+    }
+
     // jhipster-needle-application-properties-property
 
     public Liquibase getLiquibase() {
@@ -34,4 +40,26 @@ public class ApplicationProperties {
         }
     }
     // jhipster-needle-application-properties-property-class
+
+    public static class Catedra {
+
+        private String url;
+        private String token;
+
+        public String getUrl() {
+            return url;
+        }
+
+        public void setUrl(String url) {
+            this.url = url;
+        }
+
+        public String getToken() {
+            return token;
+        }
+
+        public void setToken(String token) {
+            this.token = token;
+        }
+    }
 }
