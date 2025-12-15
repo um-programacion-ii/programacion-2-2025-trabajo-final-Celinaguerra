@@ -4,6 +4,7 @@ import com.celi.backend.domain.Evento;
 import com.celi.backend.repository.EventoRepository;
 import com.celi.backend.service.dto.EventoDTO;
 import com.celi.backend.service.mapper.EventoMapper;
+import java.util.List;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -135,5 +136,37 @@ public class EventoService {
     public void delete(Long id) {
         LOG.debug("Request to delete Evento : {}", id);
         eventoRepository.deleteById(id);
+    }
+
+    /**
+     * Get all eventos with summarized data (eventos-resumidos).
+     * Returns only: titulo, resumen, descripcion, fecha, precioEntrada, eventoTipo.
+     *
+     * @return the list of summarized eventos.
+     */
+    @Transactional(readOnly = true)
+    public List<com.celi.backend.service.dto.EventoResumidoDTO> findAllResumidos() {
+        LOG.debug("Request to get all Eventos (resumidos)");
+        return eventoRepository.findAll().stream()
+                .map(evento -> {
+                    com.celi.backend.service.dto.EventoResumidoDTO dto = new com.celi.backend.service.dto.EventoResumidoDTO();
+                    dto.setId(evento.getId());
+                    dto.setTitulo(evento.getTitulo());
+                    dto.setResumen(evento.getResumen());
+                    dto.setDescripcion(evento.getDescripcion());
+                    dto.setFecha(evento.getFecha());
+                    dto.setPrecioEntrada(evento.getPrecioEntrada());
+
+                    // Map TipoEvento
+                    if (evento.getEventoTipo() != null) {
+                        com.celi.backend.service.dto.TipoEventoDTO tipoDto = new com.celi.backend.service.dto.TipoEventoDTO();
+                        tipoDto.setNombre(evento.getEventoTipo().getNombre());
+                        tipoDto.setDescripcion(evento.getEventoTipo().getDescripcion());
+                        dto.setEventoTipo(tipoDto);
+                    }
+
+                    return dto;
+                })
+                .toList();
     }
 }
