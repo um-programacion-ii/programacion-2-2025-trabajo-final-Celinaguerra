@@ -9,6 +9,7 @@ import com.celi.backend.repository.IntegranteRepository;
 import com.celi.backend.repository.TipoEventoRepository;
 import com.celi.backend.service.dto.catedra.CatedraEventoDTO;
 import com.celi.backend.service.dto.catedra.CatedraIntegranteDTO;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -50,7 +51,7 @@ public class CatedraSyncService {
 
     public void syncEventos() {
         log.info("Iniciando sincronización de eventos con la cátedra...");
-        String url = applicationProperties.getCatedra().getUrl() + "/eventos"; // Payload 4
+        String url = applicationProperties.getCatedra().getUrl() + "/endpoints/v1/eventos"; // Payload 4
         String token = applicationProperties.getCatedra().getToken();
 
         HttpHeaders headers = new HttpHeaders();
@@ -58,15 +59,71 @@ public class CatedraSyncService {
         HttpEntity<String> entity = new HttpEntity<>(headers);
 
         try {
-            var response = restTemplate.exchange(url, HttpMethod.GET, entity, CatedraEventoDTO[].class);
-            if (response.getBody() != null) {
-                List<CatedraEventoDTO> eventosExternos = Arrays.asList(response.getBody());
+            // Debug: Fetch raw string first
+            var responseString = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
+            String json = responseString.getBody();
+            log.info("RAW JSON CATEDRA: {}", json);
+
+            if (json != null) {
+                com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+                mapper.registerModule(new JavaTimeModule());
+                mapper.configure(com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
+                        false);
+                List<CatedraEventoDTO> eventosExternos = Arrays
+                        .asList(mapper.readValue(json, CatedraEventoDTO[].class));
+
                 processEventos(eventosExternos);
                 log.info("Sincronización finalizada. {} eventos procesados.", eventosExternos.size());
             }
         } catch (Exception e) {
             log.error("Error al sincronizar eventos: {}", e.getMessage(), e);
-            throw e;
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Synchronizes a single event from Cátedra API by its ID.
+     * If the event exists in Cátedra, updates local database and returns the event
+     * data.
+     * 
+     * @param catedraEventoId The ID of the event in Cátedra system
+     * @return Optional containing the synchronized EventoDTO, or empty if not found
+     */
+    public Optional<Evento> syncSingleEvent(Long catedraEventoId) {
+        log.info("Sincronizando evento individual desde Cátedra, ID: {}", catedraEventoId);
+        String url = applicationProperties.getCatedra().getUrl() + "/endpoints/v1/evento/" + catedraEventoId;
+        String token = applicationProperties.getCatedra().getToken();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(token);
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+
+        try {
+            var responseString = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
+            String json = responseString.getBody();
+            log.debug("Response from Cátedra for event {}: {}", catedraEventoId, json);
+
+            if (json != null) {
+                com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+                mapper.registerModule(new JavaTimeModule());
+                mapper.configure(com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
+                        false);
+
+                CatedraEventoDTO eventoDTO = mapper.readValue(json, CatedraEventoDTO.class);
+
+                // Sync the event using existing logic
+                TipoEvento tipoEvento = syncTipoEvento(eventoDTO);
+                Evento evento = syncEvento(eventoDTO, tipoEvento);
+                syncIntegrantes(eventoDTO, evento);
+
+                log.info("Evento {} sincronizado correctamente", catedraEventoId);
+                return Optional.of(evento);
+            }
+
+            return Optional.empty();
+        } catch (Exception e) {
+            log.warn("No se pudo sincronizar evento {} desde Cátedra: {}", catedraEventoId, e.getMessage());
+            return Optional.empty();
         }
     }
 
@@ -88,18 +145,26 @@ public class CatedraSyncService {
             return null;
 
         String nombreTipo = dto.getEventoTipo().getNombre();
+        if (nombreTipo == null) {
+            nombreTipo = "SIN_NOMBRE";
+        }
+
+        final String nombreFinal = nombreTipo; // for lambda
+
         return tipoEventoRepository.findAll().stream()
-                .filter(t -> t.getNombre().equalsIgnoreCase(nombreTipo))
+                .filter(t -> t.getNombre() != null && t.getNombre().equalsIgnoreCase(nombreFinal))
                 .findFirst()
                 .orElseGet(() -> {
                     TipoEvento nuevo = new TipoEvento();
-                    nuevo.setNombre(dto.getEventoTipo().getNombre());
+                    nuevo.setNombre(nombreFinal);
                     nuevo.setDescripcion(dto.getEventoTipo().getDescripcion());
                     return tipoEventoRepository.save(nuevo);
                 });
     }
 
     private Evento syncEvento(CatedraEventoDTO dto, TipoEvento tipoEvento) {
+        log.info("Procesando evento: {}, cols: {}, tipo: {}", dto.getTitulo(), dto.getColumnAsientos(),
+                dto.getEventoTipo());
 
         Optional<Evento> existing = eventoRepository.findAll().stream()
                 .filter(e -> e.getTitulo().equalsIgnoreCase(dto.getTitulo())) // Weak matching
@@ -122,20 +187,31 @@ public class CatedraSyncService {
     }
 
     private void syncIntegrantes(CatedraEventoDTO dto, Evento evento) {
+        // Clear existing integrations to prevent duplication (for ManyToMany, we clear
+        // the association)
+        // With ManyToMany, we can't just deleteAll or we lose the unique person.
+        // We just clear the relationships for this event.
+        if (evento.getIntegrantes() != null) {
+            evento.getIntegrantes().clear();
+        }
+
         if (dto.getIntegrantes() == null)
             return;
 
         for (CatedraIntegranteDTO intDto : dto.getIntegrantes()) {
+            Integrante integrante = integranteRepository
+                    .findFirstByNombreAndApellidoAndIdentificacion(intDto.getNombre(), intDto.getApellido(),
+                            intDto.getIdentificacion())
+                    .orElseGet(() -> {
+                        Integrante newInt = new Integrante();
+                        newInt.setNombre(intDto.getNombre());
+                        newInt.setApellido(intDto.getApellido());
+                        newInt.setIdentificacion(intDto.getIdentificacion());
+                        return integranteRepository.save(newInt);
+                    });
 
-            boolean exists = false;
-            if (!exists) {
-                Integrante integrante = new Integrante();
-                integrante.setNombre(intDto.getNombre());
-                integrante.setApellido(intDto.getApellido());
-                integrante.setIdentificacion(intDto.getIdentificacion());
-                integrante.setEvento(evento);
-                integranteRepository.save(integrante);
-            }
+            evento.addIntegrantes(integrante);
         }
+        eventoRepository.save(evento); // Save changes to the association
     }
 }

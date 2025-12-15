@@ -9,6 +9,7 @@ import java.util.Objects;
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class IntegranteDTO implements Serializable {
 
+    @com.fasterxml.jackson.annotation.JsonIgnore
     private Long id;
 
     private String nombre;
@@ -16,8 +17,6 @@ public class IntegranteDTO implements Serializable {
     private String apellido;
 
     private String identificacion;
-
-    private EventoDTO evento;
 
     public Long getId() {
         return id;
@@ -51,14 +50,6 @@ public class IntegranteDTO implements Serializable {
         this.identificacion = identificacion;
     }
 
-    public EventoDTO getEvento() {
-        return evento;
-    }
-
-    public void setEvento(EventoDTO evento) {
-        this.evento = evento;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -84,11 +75,10 @@ public class IntegranteDTO implements Serializable {
     @Override
     public String toString() {
         return "IntegranteDTO{" +
-            "id=" + getId() +
-            ", nombre='" + getNombre() + "'" +
-            ", apellido='" + getApellido() + "'" +
-            ", identificacion='" + getIdentificacion() + "'" +
-            ", evento=" + getEvento() +
-            "}";
+                "id=" + getId() +
+                ", nombre='" + getNombre() + "'" +
+                ", apellido='" + getApellido() + "'" +
+                ", identificacion='" + getIdentificacion() + "'" +
+                "}";
     }
 }

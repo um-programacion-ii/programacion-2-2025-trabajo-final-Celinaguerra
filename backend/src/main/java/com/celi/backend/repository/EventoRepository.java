@@ -26,15 +26,12 @@ public interface EventoRepository extends JpaRepository<Evento, Long> {
         return this.findAllWithToOneRelationships(pageable);
     }
 
-    @Query(
-        value = "select evento from Evento evento left join fetch evento.eventoTipo",
-        countQuery = "select count(evento) from Evento evento"
-    )
+    @Query(value = "select evento from Evento evento left join fetch evento.eventoTipo", countQuery = "select count(evento) from Evento evento")
     Page<Evento> findAllWithToOneRelationships(Pageable pageable);
 
-    @Query("select evento from Evento evento left join fetch evento.eventoTipo")
+    @Query("select evento from Evento evento left join fetch evento.eventoTipo left join fetch evento.integrantes")
     List<Evento> findAllWithToOneRelationships();
 
-    @Query("select evento from Evento evento left join fetch evento.eventoTipo where evento.id =:id")
+    @Query("select evento from Evento evento left join fetch evento.eventoTipo left join fetch evento.integrantes where evento.id =:id")
     Optional<Evento> findOneWithToOneRelationships(@Param("id") Long id);
 }

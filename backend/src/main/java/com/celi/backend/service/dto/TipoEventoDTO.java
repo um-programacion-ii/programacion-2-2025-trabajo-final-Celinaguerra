@@ -9,6 +9,7 @@ import java.util.Objects;
 @SuppressWarnings("common-java:DuplicatedBlocks")
 public class TipoEventoDTO implements Serializable {
 
+    @com.fasterxml.jackson.annotation.JsonIgnore
     private Long id;
 
     private String nombre;
@@ -64,9 +65,9 @@ public class TipoEventoDTO implements Serializable {
     @Override
     public String toString() {
         return "TipoEventoDTO{" +
-            "id=" + getId() +
-            ", nombre='" + getNombre() + "'" +
-            ", descripcion='" + getDescripcion() + "'" +
-            "}";
+                "id=" + getId() +
+                ", nombre='" + getNombre() + "'" +
+                ", descripcion='" + getDescripcion() + "'" +
+                "}";
     }
 }

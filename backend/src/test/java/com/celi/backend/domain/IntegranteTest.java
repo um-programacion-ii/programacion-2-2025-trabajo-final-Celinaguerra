@@ -23,15 +23,4 @@ class IntegranteTest {
         assertThat(integrante1).isNotEqualTo(integrante2);
     }
 
-    @Test
-    void eventoTest() {
-        Integrante integrante = getIntegranteRandomSampleGenerator();
-        Evento eventoBack = getEventoRandomSampleGenerator();
-
-        integrante.setEvento(eventoBack);
-        assertThat(integrante.getEvento()).isEqualTo(eventoBack);
-
-        integrante.evento(null);
-        assertThat(integrante.getEvento()).isNull();
-    }
 }

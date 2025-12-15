@@ -31,11 +31,7 @@ public class Integrante implements Serializable {
     @Column(name = "identificacion")
     private String identificacion;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(value = { "integrantes", "eventoTipo" }, allowSetters = true)
-    private Evento evento;
-
-    // jhipster-needle-entity-add-field - JHipster will add fields here
+    // Evento relationship removed for ManyToMany unidirectional/owner-side refactor
 
     public Long getId() {
         return this.id;
@@ -89,20 +85,8 @@ public class Integrante implements Serializable {
         this.identificacion = identificacion;
     }
 
-    public Evento getEvento() {
-        return this.evento;
-    }
-
-    public void setEvento(Evento evento) {
-        this.evento = evento;
-    }
-
-    public Integrante evento(Evento evento) {
-        this.setEvento(evento);
-        return this;
-    }
-
-    // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
+    // jhipster-needle-entity-add-getters-setters - JHipster will add getters and
+    // setters here
 
     @Override
     public boolean equals(Object o) {
@@ -117,7 +101,8 @@ public class Integrante implements Serializable {
 
     @Override
     public int hashCode() {
-        // see https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
+        // see
+        // https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
         return getClass().hashCode();
     }
 
@@ -125,10 +110,10 @@ public class Integrante implements Serializable {
     @Override
     public String toString() {
         return "Integrante{" +
-            "id=" + getId() +
-            ", nombre='" + getNombre() + "'" +
-            ", apellido='" + getApellido() + "'" +
-            ", identificacion='" + getIdentificacion() + "'" +
-            "}";
+                "id=" + getId() +
+                ", nombre='" + getNombre() + "'" +
+                ", apellido='" + getApellido() + "'" +
+                ", identificacion='" + getIdentificacion() + "'" +
+                "}";
     }
 }
