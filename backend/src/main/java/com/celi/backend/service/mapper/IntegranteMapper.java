@@ -1,8 +1,6 @@
 package com.celi.backend.service.mapper;
 
-import com.celi.backend.domain.Evento;
 import com.celi.backend.domain.Integrante;
-import com.celi.backend.service.dto.EventoDTO;
 import com.celi.backend.service.dto.IntegranteDTO;
 import org.mapstruct.*;
 
@@ -11,11 +9,7 @@ import org.mapstruct.*;
  */
 @Mapper(componentModel = "spring")
 public interface IntegranteMapper extends EntityMapper<IntegranteDTO, Integrante> {
-    @Mapping(target = "evento", source = "evento", qualifiedByName = "eventoId")
-    IntegranteDTO toDto(Integrante s);
-
-    @Named("eventoId")
-    @BeanMapping(ignoreByDefault = true)
-    @Mapping(target = "id", source = "id")
-    EventoDTO toDtoEventoId(Evento evento);
+    @Named("partialUpdate")
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    void partialUpdate(@MappingTarget Integrante entity, IntegranteDTO dto);
 }

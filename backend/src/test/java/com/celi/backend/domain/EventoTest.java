@@ -33,19 +33,15 @@ class EventoTest {
 
         evento.addIntegrantes(integranteBack);
         assertThat(evento.getIntegrantes()).containsOnly(integranteBack);
-        assertThat(integranteBack.getEvento()).isEqualTo(evento);
 
         evento.removeIntegrantes(integranteBack);
         assertThat(evento.getIntegrantes()).doesNotContain(integranteBack);
-        assertThat(integranteBack.getEvento()).isNull();
 
         evento.integrantes(new HashSet<>(Set.of(integranteBack)));
         assertThat(evento.getIntegrantes()).containsOnly(integranteBack);
-        assertThat(integranteBack.getEvento()).isEqualTo(evento);
 
         evento.setIntegrantes(new HashSet<>());
         assertThat(evento.getIntegrantes()).doesNotContain(integranteBack);
-        assertThat(integranteBack.getEvento()).isNull();
     }
 
     @Test

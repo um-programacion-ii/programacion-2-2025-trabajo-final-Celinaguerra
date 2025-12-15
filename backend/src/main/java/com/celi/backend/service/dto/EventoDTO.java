@@ -4,7 +4,10 @@ import jakarta.persistence.Lob;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 /**
  * A DTO for the {@link com.celi.backend.domain.Evento} entity.
@@ -37,6 +40,9 @@ public class EventoDTO implements Serializable {
     private Double precioEntrada;
 
     private TipoEventoDTO eventoTipo;
+
+    @JsonIgnoreProperties(value = { "evento" }, allowSetters = true)
+    private Set<IntegranteDTO> integrantes = new HashSet<>();
 
     public Long getId() {
         return id;
@@ -126,6 +132,14 @@ public class EventoDTO implements Serializable {
         this.eventoTipo = eventoTipo;
     }
 
+    public Set<IntegranteDTO> getIntegrantes() {
+        return integrantes;
+    }
+
+    public void setIntegrantes(Set<IntegranteDTO> integrantes) {
+        this.integrantes = integrantes;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -147,21 +161,21 @@ public class EventoDTO implements Serializable {
         return Objects.hash(this.id);
     }
 
-    // prettier-ignore
     @Override
     public String toString() {
         return "EventoDTO{" +
-            "id=" + getId() +
-            ", titulo='" + getTitulo() + "'" +
-            ", resumen='" + getResumen() + "'" +
-            ", descripcion='" + getDescripcion() + "'" +
-            ", fecha='" + getFecha() + "'" +
-            ", direccion='" + getDireccion() + "'" +
-            ", imagen='" + getImagen() + "'" +
-            ", filaAsientos=" + getFilaAsientos() +
-            ", columnAsientos=" + getColumnAsientos() +
-            ", precioEntrada=" + getPrecioEntrada() +
-            ", eventoTipo=" + getEventoTipo() +
-            "}";
+                "id=" + getId() +
+                ", titulo='" + getTitulo() + "'" +
+                ", resumen='" + getResumen() + "'" +
+                ", descripcion='" + getDescripcion() + "'" +
+                ", fecha='" + getFecha() + "'" +
+                ", direccion='" + getDireccion() + "'" +
+                ", imagen='" + getImagen() + "'" +
+                ", filaAsientos=" + getFilaAsientos() +
+                ", columnAsientos=" + getColumnAsientos() +
+                ", precioEntrada=" + getPrecioEntrada() +
+                ", eventoTipo=" + getEventoTipo() +
+                ", integrantes=" + getIntegrantes() +
+                "}";
     }
 }

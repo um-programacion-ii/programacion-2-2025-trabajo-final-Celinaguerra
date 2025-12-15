@@ -1,5 +1,6 @@
 package com.celi.backend.service.dto.catedra;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.List;
@@ -12,10 +13,19 @@ public class CatedraEventoDTO implements Serializable {
     private Instant fecha;
     private String direccion; // Payload 4
     private String imagen; // Payload 4
+
+    @JsonAlias({ "fila_asientos", "filaAsientos" })
     private Integer filaAsientos; // Payload 4
-    private Integer columnAsientos; // Payload 4
+
+    @JsonAlias({ "column_asientos", "columnaAsientos" })
+    private Integer columnAsientos; // JSON key is "columnaAsientos"
+
+    @JsonAlias({ "precio_entrada", "precioEntrada" })
     private Double precioEntrada;
-    private CatedraTipoEventoDTO eventoTipo;
+
+    @JsonAlias({ "evento_tipo", "tipo" })
+    private CatedraTipoEventoDTO eventoTipo; // JSON key is "tipo"
+
     private List<CatedraIntegranteDTO> integrantes; // Payload 4
 
     // Getters and Setters

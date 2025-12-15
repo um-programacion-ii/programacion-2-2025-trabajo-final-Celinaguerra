@@ -57,9 +57,10 @@ public class Evento implements Serializable {
     @Column(name = "precio_entrada", nullable = false)
     private Double precioEntrada;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "evento")
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "rel_evento__integrante", joinColumns = @JoinColumn(name = "evento_id"), inverseJoinColumns = @JoinColumn(name = "integrante_id"))
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-    @JsonIgnoreProperties(value = { "evento" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "eventos" }, allowSetters = true)
     private Set<Integrante> integrantes = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -202,12 +203,6 @@ public class Evento implements Serializable {
     }
 
     public void setIntegrantes(Set<Integrante> integrantes) {
-        if (this.integrantes != null) {
-            this.integrantes.forEach(i -> i.setEvento(null));
-        }
-        if (integrantes != null) {
-            integrantes.forEach(i -> i.setEvento(this));
-        }
         this.integrantes = integrantes;
     }
 
@@ -218,13 +213,11 @@ public class Evento implements Serializable {
 
     public Evento addIntegrantes(Integrante integrante) {
         this.integrantes.add(integrante);
-        integrante.setEvento(this);
         return this;
     }
 
     public Evento removeIntegrantes(Integrante integrante) {
         this.integrantes.remove(integrante);
-        integrante.setEvento(null);
         return this;
     }
 
