@@ -81,6 +81,52 @@ public class CatedraSyncService {
         }
     }
 
+    /**
+     * Synchronizes a single event from Cátedra API by its ID.
+     * If the event exists in Cátedra, updates local database and returns the event
+     * data.
+     * 
+     * @param catedraEventoId The ID of the event in Cátedra system
+     * @return Optional containing the synchronized EventoDTO, or empty if not found
+     */
+    public Optional<Evento> syncSingleEvent(Long catedraEventoId) {
+        log.info("Sincronizando evento individual desde Cátedra, ID: {}", catedraEventoId);
+        String url = applicationProperties.getCatedra().getUrl() + "/endpoints/v1/evento/" + catedraEventoId;
+        String token = applicationProperties.getCatedra().getToken();
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(token);
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+
+        try {
+            var responseString = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
+            String json = responseString.getBody();
+            log.debug("Response from Cátedra for event {}: {}", catedraEventoId, json);
+
+            if (json != null) {
+                com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+                mapper.registerModule(new JavaTimeModule());
+                mapper.configure(com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
+                        false);
+
+                CatedraEventoDTO eventoDTO = mapper.readValue(json, CatedraEventoDTO.class);
+
+                // Sync the event using existing logic
+                TipoEvento tipoEvento = syncTipoEvento(eventoDTO);
+                Evento evento = syncEvento(eventoDTO, tipoEvento);
+                syncIntegrantes(eventoDTO, evento);
+
+                log.info("Evento {} sincronizado correctamente", catedraEventoId);
+                return Optional.of(evento);
+            }
+
+            return Optional.empty();
+        } catch (Exception e) {
+            log.warn("No se pudo sincronizar evento {} desde Cátedra: {}", catedraEventoId, e.getMessage());
+            return Optional.empty();
+        }
+    }
+
     private void processEventos(List<CatedraEventoDTO> eventosExternos) {
         for (CatedraEventoDTO dto : eventosExternos) {
             // 1. Sync TipoEvento

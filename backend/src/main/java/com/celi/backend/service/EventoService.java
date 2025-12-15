@@ -25,9 +25,13 @@ public class EventoService {
 
     private final EventoMapper eventoMapper;
 
-    public EventoService(EventoRepository eventoRepository, EventoMapper eventoMapper) {
+    private final CatedraSyncService catedraSyncService;
+
+    public EventoService(EventoRepository eventoRepository, EventoMapper eventoMapper,
+            CatedraSyncService catedraSyncService) {
         this.eventoRepository = eventoRepository;
         this.eventoMapper = eventoMapper;
+        this.catedraSyncService = catedraSyncService;
     }
 
     /**
@@ -66,14 +70,14 @@ public class EventoService {
         LOG.debug("Request to partially update Evento : {}", eventoDTO);
 
         return eventoRepository
-            .findById(eventoDTO.getId())
-            .map(existingEvento -> {
-                eventoMapper.partialUpdate(existingEvento, eventoDTO);
+                .findById(eventoDTO.getId())
+                .map(existingEvento -> {
+                    eventoMapper.partialUpdate(existingEvento, eventoDTO);
 
-                return existingEvento;
-            })
-            .map(eventoRepository::save)
-            .map(eventoMapper::toDto);
+                    return existingEvento;
+                })
+                .map(eventoRepository::save)
+                .map(eventoMapper::toDto);
     }
 
     /**
@@ -99,6 +103,7 @@ public class EventoService {
 
     /**
      * Get one evento by id.
+     * Attempts to sync from Cátedra API first to ensure data is up-to-date.
      *
      * @param id the id of the entity.
      * @return the entity.
@@ -106,6 +111,19 @@ public class EventoService {
     @Transactional(readOnly = true)
     public Optional<EventoDTO> findOne(Long id) {
         LOG.debug("Request to get Evento : {}", id);
+
+        // Try to sync from Cátedra first (the ID in our system matches Cátedra's ID)
+        try {
+            Optional<Evento> syncedEvent = catedraSyncService.syncSingleEvent(id);
+            if (syncedEvent.isPresent()) {
+                LOG.debug("Evento {} successfully synced from Cátedra", id);
+                return syncedEvent.map(eventoMapper::toDto);
+            }
+        } catch (Exception e) {
+            LOG.warn("Failed to sync evento {} from Cátedra, falling back to local data: {}", id, e.getMessage());
+        }
+
+        // Fallback to local data if sync failed or event not found in Cátedra
         return eventoRepository.findOneWithEagerRelationships(id).map(eventoMapper::toDto);
     }
 
