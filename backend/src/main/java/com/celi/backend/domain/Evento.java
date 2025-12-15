@@ -44,7 +44,7 @@ public class Evento implements Serializable {
     @Column(name = "direccion")
     private String direccion;
 
-    @Column(name = "imagen")
+    @Column(name = "imagen", length = 2048)
     private String imagen;
 
     @Column(name = "fila_asientos")
@@ -241,7 +241,8 @@ public class Evento implements Serializable {
         return this;
     }
 
-    // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
+    // jhipster-needle-entity-add-getters-setters - JHipster will add getters and
+    // setters here
 
     @Override
     public boolean equals(Object o) {
@@ -256,7 +257,8 @@ public class Evento implements Serializable {
 
     @Override
     public int hashCode() {
-        // see https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
+        // see
+        // https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
         return getClass().hashCode();
     }
 
@@ -264,16 +266,16 @@ public class Evento implements Serializable {
     @Override
     public String toString() {
         return "Evento{" +
-            "id=" + getId() +
-            ", titulo='" + getTitulo() + "'" +
-            ", resumen='" + getResumen() + "'" +
-            ", descripcion='" + getDescripcion() + "'" +
-            ", fecha='" + getFecha() + "'" +
-            ", direccion='" + getDireccion() + "'" +
-            ", imagen='" + getImagen() + "'" +
-            ", filaAsientos=" + getFilaAsientos() +
-            ", columnAsientos=" + getColumnAsientos() +
-            ", precioEntrada=" + getPrecioEntrada() +
-            "}";
+                "id=" + getId() +
+                ", titulo='" + getTitulo() + "'" +
+                ", resumen='" + getResumen() + "'" +
+                ", descripcion='" + getDescripcion() + "'" +
+                ", fecha='" + getFecha() + "'" +
+                ", direccion='" + getDireccion() + "'" +
+                ", imagen='" + getImagen() + "'" +
+                ", filaAsientos=" + getFilaAsientos() +
+                ", columnAsientos=" + getColumnAsientos() +
+                ", precioEntrada=" + getPrecioEntrada() +
+                "}";
     }
 }

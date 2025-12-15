@@ -133,4 +133,4 @@ jhipster:
 application:
   catedra:
     url: ${CATEDRA_URL:http://192.168.194.250:8080/api}
-    token: ${CATEDRA_TOKEN:eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJjZWxpIiwiZXhwIjoxODUyMTQ3OTczLCJhdXRoIjoiUk9MRV9VU0VSIiwiaWF0IjoxNzY1NzQ3OTczfQ.M4FqYHOwZlDolP-_GYdRtfHR0Jwejq_JaIrhtGoSYAzUhihaDJaXN0cbOa-57y_r45J1Bu3zgaaS2NnI0JChOQ}
+    token: ${CATEDRA_TOKEN:eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJjZWxpIiwiZXhwIjoxODUyMTU1ODk1LCJhdXRoIjoiUk9MRV9VU0VSIiwiaWF0IjoxNzY1NzU1ODk1fQ.tWWddUK0tnteN_iGvIoECKvRa2Q6cnBk8c_tV8E43iDZv2x8VSp-MygUDLQ76_5RdjOsZwk9kXDWBWmKhVZ8Mw}
