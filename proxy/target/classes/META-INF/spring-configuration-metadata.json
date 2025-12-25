@@ -1,0 +1,40 @@
+{
+  "groups": [
+    {
+      "name": "application",
+      "type": "com.celi.proxy.config.ApplicationProperties",
+      "sourceType": "com.celi.proxy.config.ApplicationProperties"
+    },
+    {
+      "name": "application.backend",
+      "type": "com.celi.proxy.config.ApplicationProperties$Backend",
+      "sourceType": "com.celi.proxy.config.ApplicationProperties",
+      "sourceMethod": "public com.celi.proxy.config.ApplicationProperties.Backend getBackend() "
+    },
+    {
+      "name": "application.security",
+      "type": "com.celi.proxy.config.ApplicationProperties$Security",
+      "sourceType": "com.celi.proxy.config.ApplicationProperties",
+      "sourceMethod": "public com.celi.proxy.config.ApplicationProperties.Security getSecurity() "
+    },
+    {
+      "name": "application.security.jwt",
+      "type": "com.celi.proxy.config.ApplicationProperties$Security$Jwt",
+      "sourceType": "com.celi.proxy.config.ApplicationProperties$Security",
+      "sourceMethod": "public com.celi.proxy.config.ApplicationProperties.Security.Jwt getJwt() "
+    }
+  ],
+  "properties": [
+    {
+      "name": "application.backend.url",
+      "type": "java.lang.String",
+      "sourceType": "com.celi.proxy.config.ApplicationProperties$Backend"
+    },
+    {
+      "name": "application.security.jwt.base64-secret",
+      "type": "java.lang.String",
+      "sourceType": "com.celi.proxy.config.ApplicationProperties$Security$Jwt"
+    }
+  ],
+  "hints": []
+}

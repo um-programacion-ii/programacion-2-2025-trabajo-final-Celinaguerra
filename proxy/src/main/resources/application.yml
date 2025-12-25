@@ -1,0 +1,13 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: proxy-service
+  profiles:
+    active: dev
+
+application:
+  security:
+    jwt:
+      base64-secret: ${JWT_SECRET:MjY1NjNlNmM2MDkwMGMxODgxOWYxYjk5NzUwNzhiNGY5ZjY1OTk1NzBiNjdlOGU1MjFkYWVlMTlmMmRhZGI1ZTYwZWM3ZjQ4YjhmZWI1YzNiYzM5ZWExZmI0ODEzOTZmZjc0ZDYwN2M0ODVkYTVhNWM1ZGJhYzE3YTMxZGQ2YTM=}
