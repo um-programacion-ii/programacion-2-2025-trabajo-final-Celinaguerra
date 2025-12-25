@@ -122,4 +122,4 @@ jhipster:
 application:
   catedra:
     url: ${CATEDRA_URL:http://192.168.194.250:8080/api}
-    token: ${CATEDRA_TOKEN:eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJjZWxpIiwiZXhwIjoxODUyMTU1ODk1LCJhdXRoIjoiUk9MRV9VU0VSIiwiaWF0IjoxNzY1NzU1ODk1fQ.tWWddUK0tnteN_iGvIoECKvRa2Q6cnBk8c_tV8E43iDZv2x8VSp-MygUDLQ76_5RdjOsZwk9kXDWBWmKhVZ8Mw}
+    token: ${CATEDRA_TOKEN:eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJjZWxpIiwiZXhwIjoxNzY5Mjg3MDk2LCJhdXRoIjoiUk9MRV9VU0VSIiwiaWF0IjoxNzY2Njk1MDk2fQ.zmt0LFtc5xnabYenybLmoSTA_N8Gj_pAT74cTzByMICpRHOZTdl5u8liRWBvhm38zMeKXKtRsPUknE_Mhpwldg}
