@@ -51,7 +51,7 @@ public class CatedraSyncService {
 
     public void syncEventos() {
         log.info("Iniciando sincronización de eventos con la cátedra...");
-        String url = applicationProperties.getCatedra().getUrl() + "/endpoints/v1/eventos"; // Payload 4
+        String url = applicationProperties.getCatedra().getUrl() + "/eventos"; // Now goes through proxy
         String token = applicationProperties.getCatedra().getToken();
 
         HttpHeaders headers = new HttpHeaders();
@@ -91,7 +91,7 @@ public class CatedraSyncService {
      */
     public Optional<Evento> syncSingleEvent(Long catedraEventoId) {
         log.info("Sincronizando evento individual desde Cátedra, ID: {}", catedraEventoId);
-        String url = applicationProperties.getCatedra().getUrl() + "/endpoints/v1/evento/" + catedraEventoId;
+        String url = applicationProperties.getCatedra().getUrl() + "/evento/" + catedraEventoId;
         String token = applicationProperties.getCatedra().getToken();
 
         HttpHeaders headers = new HttpHeaders();
