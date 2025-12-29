@@ -9,25 +9,25 @@
       "name": "application.backend",
       "type": "com.celi.proxy.config.ApplicationProperties$Backend",
       "sourceType": "com.celi.proxy.config.ApplicationProperties",
-      "sourceMethod": "public com.celi.proxy.config.ApplicationProperties.Backend getBackend() "
+      "sourceMethod": "getBackend()"
     },
     {
       "name": "application.catedra",
       "type": "com.celi.proxy.config.ApplicationProperties$Catedra",
       "sourceType": "com.celi.proxy.config.ApplicationProperties",
-      "sourceMethod": "public com.celi.proxy.config.ApplicationProperties.Catedra getCatedra() "
+      "sourceMethod": "getCatedra()"
     },
     {
       "name": "application.security",
       "type": "com.celi.proxy.config.ApplicationProperties$Security",
       "sourceType": "com.celi.proxy.config.ApplicationProperties",
-      "sourceMethod": "public com.celi.proxy.config.ApplicationProperties.Security getSecurity() "
+      "sourceMethod": "getSecurity()"
     },
     {
       "name": "application.security.jwt",
       "type": "com.celi.proxy.config.ApplicationProperties$Security$Jwt",
       "sourceType": "com.celi.proxy.config.ApplicationProperties$Security",
-      "sourceMethod": "public com.celi.proxy.config.ApplicationProperties.Security.Jwt getJwt() "
+      "sourceMethod": "getJwt()"
     }
   ],
   "properties": [

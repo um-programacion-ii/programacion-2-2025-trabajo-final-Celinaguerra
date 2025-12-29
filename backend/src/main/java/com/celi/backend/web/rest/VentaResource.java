@@ -51,7 +51,9 @@ public class VentaResource {
      * {@code POST  /ventas} : Create a new venta.
      *
      * @param ventaDTO the ventaDTO to create.
-     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new ventaDTO, or with status {@code 400 (Bad Request)} if the venta has already an ID.
+     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with
+     *         body the new ventaDTO, or with status {@code 400 (Bad Request)} if
+     *         the venta has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("")
@@ -62,25 +64,28 @@ public class VentaResource {
         }
         ventaDTO = ventaService.save(ventaDTO);
         return ResponseEntity.created(new URI("/api/ventas/" + ventaDTO.getId()))
-            .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, ventaDTO.getId().toString()))
-            .body(ventaDTO);
+                .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME,
+                        ventaDTO.getId().toString()))
+                .body(ventaDTO);
     }
 
     /**
      * {@code PUT  /ventas/:id} : Updates an existing venta.
      *
-     * @param id the id of the ventaDTO to save.
+     * @param id       the id of the ventaDTO to save.
      * @param ventaDTO the ventaDTO to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated ventaDTO,
-     * or with status {@code 400 (Bad Request)} if the ventaDTO is not valid,
-     * or with status {@code 500 (Internal Server Error)} if the ventaDTO couldn't be updated.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body
+     *         the updated ventaDTO,
+     *         or with status {@code 400 (Bad Request)} if the ventaDTO is not
+     *         valid,
+     *         or with status {@code 500 (Internal Server Error)} if the ventaDTO
+     *         couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PutMapping("/{id}")
     public ResponseEntity<VentaDTO> updateVenta(
-        @PathVariable(value = "id", required = false) final Long id,
-        @Valid @RequestBody VentaDTO ventaDTO
-    ) throws URISyntaxException {
+            @PathVariable(value = "id", required = false) final Long id,
+            @Valid @RequestBody VentaDTO ventaDTO) throws URISyntaxException {
         LOG.debug("REST request to update Venta : {}, {}", id, ventaDTO);
         if (ventaDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
@@ -95,26 +100,30 @@ public class VentaResource {
 
         ventaDTO = ventaService.update(ventaDTO);
         return ResponseEntity.ok()
-            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, ventaDTO.getId().toString()))
-            .body(ventaDTO);
+                .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME,
+                        ventaDTO.getId().toString()))
+                .body(ventaDTO);
     }
 
     /**
-     * {@code PATCH  /ventas/:id} : Partial updates given fields of an existing venta, field will ignore if it is null
+     * {@code PATCH  /ventas/:id} : Partial updates given fields of an existing
+     * venta, field will ignore if it is null
      *
-     * @param id the id of the ventaDTO to save.
+     * @param id       the id of the ventaDTO to save.
      * @param ventaDTO the ventaDTO to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the updated ventaDTO,
-     * or with status {@code 400 (Bad Request)} if the ventaDTO is not valid,
-     * or with status {@code 404 (Not Found)} if the ventaDTO is not found,
-     * or with status {@code 500 (Internal Server Error)} if the ventaDTO couldn't be updated.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body
+     *         the updated ventaDTO,
+     *         or with status {@code 400 (Bad Request)} if the ventaDTO is not
+     *         valid,
+     *         or with status {@code 404 (Not Found)} if the ventaDTO is not found,
+     *         or with status {@code 500 (Internal Server Error)} if the ventaDTO
+     *         couldn't be updated.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
     public ResponseEntity<VentaDTO> partialUpdateVenta(
-        @PathVariable(value = "id", required = false) final Long id,
-        @NotNull @RequestBody VentaDTO ventaDTO
-    ) throws URISyntaxException {
+            @PathVariable(value = "id", required = false) final Long id,
+            @NotNull @RequestBody VentaDTO ventaDTO) throws URISyntaxException {
         LOG.debug("REST request to partial update Venta partially : {}, {}", id, ventaDTO);
         if (ventaDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
@@ -130,23 +139,23 @@ public class VentaResource {
         Optional<VentaDTO> result = ventaService.partialUpdate(ventaDTO);
 
         return ResponseUtil.wrapOrNotFound(
-            result,
-            HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, ventaDTO.getId().toString())
-        );
+                result,
+                HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, ventaDTO.getId().toString()));
     }
 
     /**
      * {@code GET  /ventas} : get all the ventas.
      *
-     * @param pageable the pagination information.
-     * @param eagerload flag to eager load entities from relationships (This is applicable for many-to-many).
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of ventas in body.
+     * @param pageable  the pagination information.
+     * @param eagerload flag to eager load entities from relationships (This is
+     *                  applicable for many-to-many).
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list
+     *         of ventas in body.
      */
     @GetMapping("")
     public ResponseEntity<List<VentaDTO>> getAllVentas(
-        @org.springdoc.core.annotations.ParameterObject Pageable pageable,
-        @RequestParam(name = "eagerload", required = false, defaultValue = "true") boolean eagerload
-    ) {
+            @org.springdoc.core.annotations.ParameterObject Pageable pageable,
+            @RequestParam(name = "eagerload", required = false, defaultValue = "true") boolean eagerload) {
         LOG.debug("REST request to get a page of Ventas");
         Page<VentaDTO> page;
         if (eagerload) {
@@ -154,7 +163,8 @@ public class VentaResource {
         } else {
             page = ventaService.findAll(pageable);
         }
-        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
+        HttpHeaders headers = PaginationUtil
+                .generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return ResponseEntity.ok().headers(headers).body(page.getContent());
     }
 
@@ -162,7 +172,8 @@ public class VentaResource {
      * {@code GET  /ventas/:id} : get the "id" venta.
      *
      * @param id the id of the ventaDTO to retrieve.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the ventaDTO, or with status {@code 404 (Not Found)}.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body
+     *         the ventaDTO, or with status {@code 404 (Not Found)}.
      */
     @GetMapping("/{id}")
     public ResponseEntity<VentaDTO> getVenta(@PathVariable("id") Long id) {
@@ -182,7 +193,7 @@ public class VentaResource {
         LOG.debug("REST request to delete Venta : {}", id);
         ventaService.delete(id);
         return ResponseEntity.noContent()
-            .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
-            .build();
+                .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
+                .build();
     }
 }

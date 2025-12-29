@@ -128,15 +128,15 @@ public class VentaDTO implements Serializable {
     @Override
     public String toString() {
         return "VentaDTO{" +
-            "id=" + getId() +
-            ", ventaIdCatedra=" + getVentaIdCatedra() +
-            ", fechaVenta='" + getFechaVenta() + "'" +
-            ", precioVenta=" + getPrecioVenta() +
-            ", resultado='" + getResultado() + "'" +
-            ", descripcion='" + getDescripcion() + "'" +
-            ", cantidadAsientos=" + getCantidadAsientos() +
-            ", user=" + getUser() +
-            ", evento=" + getEvento() +
-            "}";
+                "id=" + getId() +
+                ", ventaIdCatedra=" + getVentaIdCatedra() +
+                ", fechaVenta='" + getFechaVenta() + "'" +
+                ", precioVenta=" + getPrecioVenta() +
+                ", resultado='" + getResultado() + "'" +
+                ", descripcion='" + getDescripcion() + "'" +
+                ", cantidadAsientos=" + getCantidadAsientos() +
+                ", user=" + getUser() +
+                ", evento=" + getEvento() +
+                "}";
     }
 }
