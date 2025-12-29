@@ -66,14 +66,14 @@ public class VentaService {
         LOG.debug("Request to partially update Venta : {}", ventaDTO);
 
         return ventaRepository
-            .findById(ventaDTO.getId())
-            .map(existingVenta -> {
-                ventaMapper.partialUpdate(existingVenta, ventaDTO);
+                .findById(ventaDTO.getId())
+                .map(existingVenta -> {
+                    ventaMapper.partialUpdate(existingVenta, ventaDTO);
 
-                return existingVenta;
-            })
-            .map(ventaRepository::save)
-            .map(ventaMapper::toDto);
+                    return existingVenta;
+                })
+                .map(ventaRepository::save)
+                .map(ventaMapper::toDto);
     }
 
     /**

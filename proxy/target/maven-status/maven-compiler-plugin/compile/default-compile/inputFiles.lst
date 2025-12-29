@@ -7,4 +7,5 @@
 /home/celi/programacion2/programacion-2-2025-trabajo-final-Celinaguerra/proxy/src/main/java/com/celi/proxy/service/BackendNotificationService.java
 /home/celi/programacion2/programacion-2-2025-trabajo-final-Celinaguerra/proxy/src/main/java/com/celi/proxy/service/KafkaConsumerService.java
 /home/celi/programacion2/programacion-2-2025-trabajo-final-Celinaguerra/proxy/src/main/java/com/celi/proxy/service/RedisService.java
+/home/celi/programacion2/programacion-2-2025-trabajo-final-Celinaguerra/proxy/src/main/java/com/celi/proxy/web/rest/AsientoResource.java
 /home/celi/programacion2/programacion-2-2025-trabajo-final-Celinaguerra/proxy/src/main/java/com/celi/proxy/web/rest/CatedraProxyResource.java
