@@ -212,4 +212,29 @@ public class EventoResource {
         List<com.celi.backend.service.dto.EventoResumidoDTO> eventos = eventoService.findAllResumidos();
         return ResponseEntity.ok().body(eventos);
     }
+
+    /**
+     * {@code POST  /eventos/sync-notification} : Receive notification from proxy
+     * about event update.
+     * Triggers synchronization of the specified event from Cátedra.
+     *
+     * @param notification the notification containing evento ID
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)}
+     */
+    @PostMapping("/sync-notification")
+    public ResponseEntity<Void> syncNotification(
+            @RequestBody com.celi.backend.service.dto.EventoSyncNotificationDTO notification) {
+        LOG.info("📨 Received sync notification from proxy for evento ID: {}", notification.getEventoId());
+
+        try {
+            // Trigger sync for the specific event
+            eventoService.findOne(notification.getEventoId());
+            LOG.info("✅ Event {} synchronized successfully from proxy notification", notification.getEventoId());
+        } catch (Exception e) {
+            LOG.error("❌ Failed to sync event {} from proxy notification: {}", notification.getEventoId(),
+                    e.getMessage());
+        }
+
+        return ResponseEntity.ok().build();
+    }
 }

@@ -22,3 +22,6 @@ logging:
 application:
   backend:
     url: ${BACKEND_URL:http://localhost:8080}
+  catedra:
+    url: ${CATEDRA_URL:http://192.168.194.250:8080/api}
+    token: ${CATEDRA_TOKEN:eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJjZWxpIiwiZXhwIjoxODUzMTE3MTkyLCJhdXRoIjoiUk9MRV9VU0VSIiwiaWF0IjoxNzY2NzE3MTkyfQ.g5KbKaJcIDVPTl8kdXHcnA8a9Fvd4hK_fh9nZmvbwTGAV34zeJO0-xQFPKD09MAAK2GR9rG2zt93qdypBPccPg}

@@ -29,7 +29,7 @@ spring:
       enabled: true
       additional-exclude: static/**
     livereload:
-      enabled: false # we use Webpack dev server + BrowserSync for livereload
+      enabled: false 
   jackson:
     serialization:
       indent-output: true
@@ -50,7 +50,6 @@ spring:
     hibernate:
       ddl-auto: update
   liquibase:
-    # Remove 'faker' if you do not want the sample data to be loaded automatically
     contexts: dev
   mail:
     host: localhost
@@ -58,13 +57,12 @@ spring:
     username:
     password:
   messages:
-    cache-duration: PT1S # 1 second, see the ISO 8601 standard
+    cache-duration: PT1S 
   thymeleaf:
     cache: false
 
 server:
   port: 8080
-  # make sure requests the proxy uri instead of the server one
   forward-headers-strategy: native
 
 # ===================================================================
@@ -74,18 +72,13 @@ server:
 # ===================================================================
 
 jhipster:
-  cache: # Cache configuration
-    redis: # Redis configuration
-      expiration: 3600 # By default objects stay 1 hour (in seconds) in the cache
+  cache:
+    redis: 
+      expiration: 3600 
       server: ${SPRING_DATA_REDIS_URL:redis://192.168.194.250:6379}
       cluster: false
-      # server: redis://localhost:6379,redis://localhost:16379,redis://localhost:26379
-      # cluster: true
-  # CORS is only enabled by default with the "dev" profile
   cors:
-    # Allow Ionic for JHipster by default (* no longer allowed in Spring Boot 2.4+)
     allowed-origins: 'http://localhost:8100,https://localhost:8100'
-    # Enable CORS when running in GitHub Codespaces
     allowed-origin-patterns: 'https://*.githubpreview.dev'
     allowed-methods: '*'
     allowed-headers: '*'
@@ -95,16 +88,14 @@ jhipster:
   security:
     authentication:
       jwt:
-        # This token must be encoded using Base64 and be at least 256 bits long (you can type `openssl rand -base64 64` on your command line to generate a 512 bits one)
         base64-secret: MjY1NjNlNmM2MDkwMGMxODgxOWYxYjk5NzUwNzhiNGY5ZjY1OTk1NzBiNjdlOGU1MjFkYWVlMTlmMmRhZGI1ZTYwZWM3ZjQ4YjhmZWI1YzNiYzM5ZWExZmI0ODEzOTZmZjc0ZDYwN2M0ODVkYTVhNWM1ZGJhYzE3YTMxZGQ2YTM=
-        # Token is valid 24 hours
         token-validity-in-seconds: 86400
         token-validity-in-seconds-for-remember-me: 2592000
-  mail: # specific JHipster mail property, for standard properties see MailProperties
+  mail:
     base-url: http://127.0.0.1:8080
   logging:
-    use-json-format: false # By default, logs are not in Json format
-    logstash: # Forward logs to logstash over a socket, used by LoggingConfiguration
+    use-json-format: false 
+    logstash: 
       enabled: false
       host: localhost
       port: 5000
@@ -118,8 +109,9 @@ jhipster:
 # https://www.jhipster.tech/common-application-properties/
 # ===================================================================
 
-# application:
+
 application:
   catedra:
-    url: ${CATEDRA_URL:http://192.168.194.250:8080/api}
-    token: ${CATEDRA_TOKEN:eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJjZWxpIiwiZXhwIjoxNzY5Mjg3MDk2LCJhdXRoIjoiUk9MRV9VU0VSIiwiaWF0IjoxNzY2Njk1MDk2fQ.zmt0LFtc5xnabYenybLmoSTA_N8Gj_pAT74cTzByMICpRHOZTdl5u8liRWBvhm38zMeKXKtRsPUknE_Mhpwldg}
+    # URL proxy (8081)
+    url: ${CATEDRA_URL:http://localhost:8081/api/catedra}
+    token: ${CATEDRA_TOKEN:eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJjZWxpIiwiZXhwIjoxODUyMTU1ODk1LCJhdXRoIjoiUk9MRV9VU0VSIiwiaWF0IjoxNzY1NzU1ODk1fQ.tWWddUK0tnteN_iGvIoECKvRa2Q6cnBk8c_tV8E43iDZv2x8VSp-MygUDLQ76_5RdjOsZwk9kXDWBWmKhVZ8Mw}

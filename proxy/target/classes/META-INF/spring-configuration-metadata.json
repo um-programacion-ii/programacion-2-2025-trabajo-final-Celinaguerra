@@ -12,6 +12,12 @@
       "sourceMethod": "public com.celi.proxy.config.ApplicationProperties.Backend getBackend() "
     },
     {
+      "name": "application.catedra",
+      "type": "com.celi.proxy.config.ApplicationProperties$Catedra",
+      "sourceType": "com.celi.proxy.config.ApplicationProperties",
+      "sourceMethod": "public com.celi.proxy.config.ApplicationProperties.Catedra getCatedra() "
+    },
+    {
       "name": "application.security",
       "type": "com.celi.proxy.config.ApplicationProperties$Security",
       "sourceType": "com.celi.proxy.config.ApplicationProperties",
@@ -29,6 +35,16 @@
       "name": "application.backend.url",
       "type": "java.lang.String",
       "sourceType": "com.celi.proxy.config.ApplicationProperties$Backend"
+    },
+    {
+      "name": "application.catedra.token",
+      "type": "java.lang.String",
+      "sourceType": "com.celi.proxy.config.ApplicationProperties$Catedra"
+    },
+    {
+      "name": "application.catedra.url",
+      "type": "java.lang.String",
+      "sourceType": "com.celi.proxy.config.ApplicationProperties$Catedra"
     },
     {
       "name": "application.security.jwt.base64-secret",

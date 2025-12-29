@@ -11,6 +11,7 @@ public class ApplicationProperties {
 
     private final Security security = new Security();
     private final Backend backend = new Backend();
+    private final Catedra catedra = new Catedra();
 
     @Data
     public static class Security {
@@ -25,5 +26,11 @@ public class ApplicationProperties {
     @Data
     public static class Backend {
         private String url;
+    }
+
+    @Data
+    public static class Catedra {
+        private String url;
+        private String token;
     }
 }
