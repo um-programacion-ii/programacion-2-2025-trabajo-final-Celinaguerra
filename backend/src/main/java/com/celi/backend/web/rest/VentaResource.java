@@ -70,6 +70,75 @@ public class VentaResource {
     }
 
     /**
+     * {@code POST  /ventas/comprar} : Realiza una compra de entrada completa.
+     *
+     * @param ventaDTO detalles de la venta.
+     * @return la venta creada.
+     */
+    @PostMapping("/comprar")
+    public ResponseEntity<VentaDTO> comprarEntrada(@RequestBody VentaDTO ventaDTO) throws URISyntaxException {
+        LOG.debug("REST request to comprar entrada : {}", ventaDTO);
+        if (ventaDTO.getId() != null) {
+            throw new BadRequestAlertException("A new venta cannot already have an ID", ENTITY_NAME, "idexists");
+        }
+        // Llamamos al servicio 'comprarEntrada' que orquesta Proxy + BD + Kafka
+        VentaDTO result = ventaService.comprarEntrada(ventaDTO);
+
+        if (result == null) {
+            // Si falló logicamente (ej. asiento no disponible), retornamos 400
+            throw new BadRequestAlertException("No se pudo realizar la venta (Asiento ocupado o error)", ENTITY_NAME,
+                    "ventaFailed");
+        }
+
+        return ResponseEntity.created(new URI("/api/ventas/" + result.getId()))
+                .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME,
+                        result.getId().toString()))
+                .body(result);
+    }
+
+    /**
+     * {@code POST  /ventas/bloquear} : Bloquea asientos.
+     *
+     * @param bloqueoDTO detalles del bloqueo (evento y asientos).
+     * @return el bloqueo creado.
+     */
+    @PostMapping("/bloquear")
+    public ResponseEntity<VentaDTO> bloquearAsientos(
+            @RequestBody com.celi.backend.service.dto.BloqueoRequestDTO bloqueoDTO) throws URISyntaxException {
+        LOG.debug("REST request to bloquear asientos : {}", bloqueoDTO);
+
+        // Validation
+        if (bloqueoDTO.getEventoId() == null) {
+            throw new BadRequestAlertException("Evento ID required", ENTITY_NAME, "eventoidrequired");
+        }
+        if (bloqueoDTO.getAsientos() == null || bloqueoDTO.getAsientos().isEmpty()) {
+            throw new BadRequestAlertException("Asientos required", ENTITY_NAME, "asientosrequired");
+        }
+
+        // Use user from DTO or mock for now
+        Long userId = bloqueoDTO.getUserId() != null ? bloqueoDTO.getUserId() : 1L;
+
+        try {
+            // Need to convert List to Set if service expects Set, or update Service to take
+            // List
+            // Service expects Set<AsientoDTO>
+            java.util.Set<com.celi.backend.service.dto.AsientoDTO> asientosSet = new java.util.HashSet<>(
+                    bloqueoDTO.getAsientos());
+
+            VentaDTO result = ventaService.bloquearAsientos(bloqueoDTO.getEventoId(), asientosSet, userId);
+
+            return ResponseEntity.created(new URI("/api/ventas/" + result.getId()))
+                    .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME,
+                            result.getId().toString()))
+                    .body(result);
+        } catch (Exception e) {
+            LOG.error("Error locking seats", e);
+            throw new BadRequestAlertException("Error blocking seats: " + e.getMessage(), ENTITY_NAME,
+                    "blockingFailed");
+        }
+    }
+
+    /**
      * {@code PUT  /ventas/:id} : Updates an existing venta.
      *
      * @param id       the id of the ventaDTO to save.

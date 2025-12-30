@@ -11,7 +11,7 @@ import org.mapstruct.*;
 /**
  * Mapper for the entity {@link Venta} and its DTO {@link VentaDTO}.
  */
-@Mapper(componentModel = "spring", uses = { IntegranteMapper.class, EventoMapper.class })
+@Mapper(componentModel = "spring", uses = { IntegranteMapper.class, EventoMapper.class, AsientoMapper.class })
 public interface VentaMapper extends EntityMapper<VentaDTO, Venta> {
     @Mapping(target = "user", source = "user", qualifiedByName = "userLogin")
     @Mapping(target = "evento", source = "evento", qualifiedByName = "eventoTitulo")
@@ -28,4 +28,5 @@ public interface VentaMapper extends EntityMapper<VentaDTO, Venta> {
     @Mapping(target = "id", source = "id")
     @Mapping(target = "titulo", source = "titulo")
     EventoDTO toDtoEventoTitulo(Evento evento);
+
 }

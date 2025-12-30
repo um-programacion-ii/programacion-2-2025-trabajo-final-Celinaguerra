@@ -36,15 +36,16 @@ public class RedisService {
     /**
      * Verifica si un asiento específico está libre parseando el JSON del evento.
      */
-    public boolean isSeatAvailable(Long eventoId, Integer fila, Integer columna) {
+    /**
+     * Verifica el estado específico de un asiento parseando el JSON del evento.
+     * Retorna: "LIBRE", "VENDIDO", "BLOQUEADO", "OCUPADO" (si no se sabe), o
+     * "ERROR".
+     */
+    public String getSeatStatus(Long eventoId, Integer fila, Integer columna) {
         String json = getEventSeats(eventoId);
         if (json == null) {
-            // Si no existe la key, asumimos que todo está libre (o política a definir)
-            // En este caso, si no hay info, asumimos LIBRE (true) o ERROR (false)?
-            // Por seguridad, si no hay datos de ocupación, quizás es libre.
-            // Pero el enunciado dice "Datos de la key: evento_1". Si no está, quizás no hay
-            // asientos ocupados.
-            return true;
+            // Si no existe la key, asumimos que todo está libre
+            return "LIBRE";
         }
 
         try {
@@ -58,20 +59,18 @@ public class RedisService {
 
                     if (f == fila && c == columna) {
                         String estado = asiento.get("estado").asText();
-                        // Si está en la lista, NO está libre (está Ocupado, Vendido o Bloqueado)
-                        // A menos que el estado sea explícitamente "Libre", pero usualmente Redis solo
-                        // guarda los ocupados.
-                        // Según el ejemplo user: "estado": "Bloqueado", "estado": "Vendido".
-                        return "Libre".equalsIgnoreCase(estado);
+                        // Retornamos el estado tal cual (ej: "Bloqueado", "Vendido"), convertido a
+                        // Mayusculas para consistencia
+                        return estado != null ? estado.toUpperCase() : "OCUPADO";
                     }
                 }
             }
             // Si no está en la lista de ocupados, está libre
-            return true;
+            return "LIBRE";
 
         } catch (Exception e) {
             log.error("Error parsing Redis JSON for seat check: {}", e.getMessage());
-            return false; // Ante error, asumimos ocupado para prevenir doble venta
+            return "ERROR";
         }
     }
 

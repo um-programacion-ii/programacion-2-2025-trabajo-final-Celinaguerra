@@ -4,6 +4,8 @@ import jakarta.validation.constraints.*;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.Objects;
+import java.util.Set;
+import java.util.HashSet;
 
 /**
  * A DTO for the {@link com.celi.backend.domain.Venta} entity.
@@ -30,6 +32,9 @@ public class VentaDTO implements Serializable {
     private UserDTO user;
 
     private EventoDTO evento;
+
+    // Added field for sales logic
+    private Set<AsientoDTO> asientos = new HashSet<>();
 
     public Long getId() {
         return id;
@@ -101,6 +106,14 @@ public class VentaDTO implements Serializable {
 
     public void setEvento(EventoDTO evento) {
         this.evento = evento;
+    }
+
+    public Set<AsientoDTO> getAsientos() {
+        return asientos;
+    }
+
+    public void setAsientos(Set<AsientoDTO> asientos) {
+        this.asientos = asientos;
     }
 
     @Override

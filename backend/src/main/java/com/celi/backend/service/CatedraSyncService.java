@@ -214,4 +214,119 @@ public class CatedraSyncService {
         }
         eventoRepository.save(evento); // Save changes to the association
     }
+
+    /**
+     * Checks if a seat is available via Proxy (which checks Redis).
+     * 
+     * @param eventoId
+     * @param fila
+     * @param columna
+     * @return true if available, false otherwise
+     */
+    public String getSeatStatus(Long eventoId, int fila, int columna) {
+        String url = applicationProperties.getCatedra().getUrl().replace("/api/catedra", "")
+                + "/api/asientos/" + eventoId + "/" + fila + "/" + columna;
+
+        String token = applicationProperties.getCatedra().getToken();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(token);
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+
+        try {
+            var response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
+            return response.getBody() != null ? response.getBody().toUpperCase() : "DESCONOCIDO";
+        } catch (Exception e) {
+            log.error("Error checking seat availability for event {} seat {}-{}: {}", eventoId, fila, columna,
+                    e.getMessage());
+            return "ERROR";
+        }
+    }
+
+    /**
+     * Executes the sale against the Cátedra API via Proxy.
+     * 
+     * @param eventoId
+     * @param asientos  list of seats to buy
+     * @param usuarioId ID of the user buying
+     * @return true if successful
+     */
+    public boolean performSale(Long eventoId, java.util.Set<com.celi.backend.service.dto.AsientoDTO> asientos,
+            Long usuarioId) {
+        String url = applicationProperties.getCatedra().getUrl() + "/realizar-venta";
+
+        String token = applicationProperties.getCatedra().getToken();
+
+        // Construct payload
+        // Expected format: {"eventoId":1, "asientos":[{"fila":1,"columna":3}],
+        // "usuarioId":123}
+        java.util.Map<String, Object> payload = new java.util.HashMap<>();
+        payload.put("eventoId", eventoId);
+
+        List<java.util.Map<String, Integer>> listaAsientos = new ArrayList<>();
+        if (asientos != null) {
+            for (com.celi.backend.service.dto.AsientoDTO a : asientos) {
+                java.util.Map<String, Integer> asientoMap = new java.util.HashMap<>();
+                asientoMap.put("fila", a.getFila());
+                asientoMap.put("columna", a.getColumna());
+                listaAsientos.add(asientoMap);
+            }
+        }
+        payload.put("asientos", listaAsientos);
+        payload.put("usuarioId", usuarioId);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(org.springframework.http.MediaType.APPLICATION_JSON);
+        headers.setBearerAuth(token);
+
+        HttpEntity<java.util.Map<String, Object>> entity = new HttpEntity<>(payload, headers);
+
+        try {
+            log.info("Sending sale request to Proxy: {}", payload);
+            restTemplate.postForEntity(url, entity, String.class);
+            return true;
+        } catch (Exception e) {
+            log.error("Error performing sale in Cátedra: {}", e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Sends a request to Cátedra (via Proxy) to block seats.
+     * 
+     * @param eventoId Event ID
+     * @param asientos List of seats to block
+     * @return true if successful
+     */
+    public boolean blockSeats(Long eventoId, List<com.celi.backend.service.dto.AsientoDTO> asientos) {
+        String url = applicationProperties.getCatedra().getUrl() + "/bloquear-asientos";
+        String token = applicationProperties.getCatedra().getToken();
+
+        // Construct payload: {"eventoId": 1, "asientos": [{"fila":1, "columna":2}]}
+        java.util.Map<String, Object> payload = new java.util.HashMap<>();
+        payload.put("eventoId", eventoId);
+
+        List<java.util.Map<String, Integer>> listaAsientos = new ArrayList<>();
+        for (com.celi.backend.service.dto.AsientoDTO a : asientos) {
+            java.util.Map<String, Integer> m = new java.util.HashMap<>();
+            m.put("fila", a.getFila());
+            m.put("columna", a.getColumna());
+            listaAsientos.add(m);
+        }
+        payload.put("asientos", listaAsientos);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(org.springframework.http.MediaType.APPLICATION_JSON);
+        headers.setBearerAuth(token);
+
+        HttpEntity<java.util.Map<String, Object>> entity = new HttpEntity<>(payload, headers);
+
+        try {
+            log.info("Sending block request to Proxy: {}", payload);
+            restTemplate.postForEntity(url, entity, String.class);
+            return true;
+        } catch (Exception e) {
+            log.error("Error blocking seats in Cátedra: {}", e.getMessage());
+            return false;
+        }
+    }
 }

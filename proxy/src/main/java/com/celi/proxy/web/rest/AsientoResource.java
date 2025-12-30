@@ -49,8 +49,8 @@ public class AsientoResource {
     public ResponseEntity<String> getAsientoEspecifico(@PathVariable Long eventoId, @PathVariable Integer fila,
             @PathVariable Integer columna) {
         log.debug("REST request to check seat: {} {} {}", eventoId, fila, columna);
-        boolean available = redisService.isSeatAvailable(eventoId, fila, columna);
-        return ResponseEntity.ok(available ? "LIBRE" : "OCUPADO");
+        String status = redisService.getSeatStatus(eventoId, fila, columna);
+        return ResponseEntity.ok(status);
     }
 
     /**
