@@ -12,17 +12,21 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class ApplicationProperties {
 
     private final Liquibase liquibase = new Liquibase();
-
     private final Catedra catedra = new Catedra();
-
-    public Catedra getCatedra() {
-        return catedra;
-    }
+    private final Proxy proxy = new Proxy();
 
     // jhipster-needle-application-properties-property
 
     public Liquibase getLiquibase() {
         return liquibase;
+    }
+
+    public Catedra getCatedra() {
+        return catedra;
+    }
+
+    public Proxy getProxy() {
+        return proxy;
     }
 
     // jhipster-needle-application-properties-property-getter
@@ -39,27 +43,70 @@ public class ApplicationProperties {
             this.asyncStart = asyncStart;
         }
     }
-    // jhipster-needle-application-properties-property-class
 
     public static class Catedra {
 
-        private String url;
-        private String token;
+        private String baseUrl;
+        private String registrationEndpoint = "/api/registro";
+        /**
+         * Token entregado por la cátedra. Se recomienda inyectarlo mediante variable de
+         * entorno.
+         */
+        private String authToken;
+        private Integer connectTimeoutMs = 5000;
+        private Integer readTimeoutMs = 10000;
 
-        public String getUrl() {
-            return url;
+        public String getBaseUrl() {
+            return baseUrl;
         }
 
-        public void setUrl(String url) {
-            this.url = url;
+        public void setBaseUrl(String baseUrl) {
+            this.baseUrl = baseUrl;
         }
 
-        public String getToken() {
-            return token;
+        public String getRegistrationEndpoint() {
+            return registrationEndpoint;
         }
 
-        public void setToken(String token) {
-            this.token = token;
+        public void setRegistrationEndpoint(String registrationEndpoint) {
+            this.registrationEndpoint = registrationEndpoint;
+        }
+
+        public String getAuthToken() {
+            return authToken;
+        }
+
+        public void setAuthToken(String authToken) {
+            this.authToken = authToken;
+        }
+
+        public Integer getConnectTimeoutMs() {
+            return connectTimeoutMs;
+        }
+
+        public void setConnectTimeoutMs(Integer connectTimeoutMs) {
+            this.connectTimeoutMs = connectTimeoutMs;
+        }
+
+        public Integer getReadTimeoutMs() {
+            return readTimeoutMs;
+        }
+
+        public void setReadTimeoutMs(Integer readTimeoutMs) {
+            this.readTimeoutMs = readTimeoutMs;
         }
     }
+
+    public static class Proxy {
+        private String baseUrl = "http://localhost:8081";
+
+        public String getBaseUrl() {
+            return baseUrl;
+        }
+
+        public void setBaseUrl(String baseUrl) {
+            this.baseUrl = baseUrl;
+        }
+    }
+    // jhipster-needle-application-properties-property-class
 }

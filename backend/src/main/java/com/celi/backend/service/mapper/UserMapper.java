@@ -1,9 +1,5 @@
 package com.celi.backend.service.mapper;
 
-import com.celi.backend.domain.Authority;
-import com.celi.backend.domain.User;
-import com.celi.backend.service.dto.AdminUserDTO;
-import com.celi.backend.service.dto.UserDTO;
 import java.util.*;
 import java.util.stream.Collectors;
 import org.mapstruct.BeanMapping;
@@ -11,10 +7,16 @@ import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import org.springframework.stereotype.Service;
 
+import com.celi.backend.domain.Authority;
+import com.celi.backend.domain.User;
+import com.celi.backend.service.dto.AdminUserDTO;
+import com.celi.backend.service.dto.UserDTO;
+
 /**
  * Mapper for the entity {@link User} and its DTO called {@link UserDTO}.
  *
- * Normal mappers are generated using MapStruct, this one is hand-coded as MapStruct
+ * Normal mappers are generated using MapStruct, this one is hand-coded as
+ * MapStruct
  * support is still in beta, and requires a manual step with an IDE.
  */
 @Service
@@ -68,13 +70,13 @@ public class UserMapper {
 
         if (authoritiesAsString != null) {
             authorities = authoritiesAsString
-                .stream()
-                .map(string -> {
-                    Authority auth = new Authority();
-                    auth.setName(string);
-                    return auth;
-                })
-                .collect(Collectors.toSet());
+                    .stream()
+                    .map(string -> {
+                        Authority auth = new Authority();
+                        auth.setName(string);
+                        return auth;
+                    })
+                    .collect(Collectors.toSet());
         }
 
         return authorities;

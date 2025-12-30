@@ -33,17 +33,14 @@ spring:
       enabled: false
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
-    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/backend?useUnicode=true&characterEncoding=utf8&useSSL=false&useLegacyDatetimeCode=false&createDatabaseIfNotExist=true}
-    username: ${SPRING_DATASOURCE_USERNAME:root}
-    password: ${SPRING_DATASOURCE_PASSWORD:}
+    url: jdbc:postgresql://localhost:5432/backend
+    username: backend
+    password:
     hikari:
       poolName: Hikari
       auto-commit: false
-      data-source-properties:
-        cachePrepStmts: true
-        prepStmtCacheSize: 250
-        prepStmtCacheSqlLimit: 2048
-        useServerPrepStmts: true
+  elasticsearch:
+    uris: http://localhost:9200
   # Replace by 'prod, faker' to add the faker context and have sample data loaded in production
   liquibase:
     contexts: prod
@@ -93,12 +90,9 @@ jhipster:
     cache: # Used by the CachingHttpHeadersFilter
       timeToLiveInDays: 1461
   cache: # Cache configuration
-    redis: # Redis configuration
-      expiration: 3600 # By default objects stay 1 hour (in seconds) in the cache
-      server: ${SPRING_DATA_REDIS_URL:redis://192.168.194.250:6379}
-      cluster: false
-      # server: redis://localhost:6379,redis://localhost:16379,redis://localhost:26379
-      # cluster: true
+    ehcache: # Ehcache configuration
+      time-to-live-seconds: 3600 # By default objects stay 1 hour in the cache
+      max-entries: 1000 # Number of objects in each cache entry
   security:
     authentication:
       jwt:
@@ -129,8 +123,16 @@ jhipster:
 # https://www.jhipster.tech/common-application-properties/
 # ===================================================================
 
-# application:
 application:
   catedra:
-    url: ${CATEDRA_URL:http://192.168.194.250:8080/api}
-    token: ${CATEDRA_TOKEN:eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJjZWxpIiwiZXhwIjoxODUyMTU1ODk1LCJhdXRoIjoiUk9MRV9VU0VSIiwiaWF0IjoxNzY1NzU1ODk1fQ.tWWddUK0tnteN_iGvIoECKvRa2Q6cnBk8c_tV8E43iDZv2x8VSp-MygUDLQ76_5RdjOsZwk9kXDWBWmKhVZ8Mw}
+    # Servicio de la cátedra en red ZeroTier (192.168.194.0/24)
+    base-url: http://192.168.194.250:8080
+    registration-endpoint: /api/v1/agregar_usuario
+    auth-token: ${CATEDRA_AUTH_TOKEN:eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJjZWxpIiwiZXhwIjoxODUzMTE3MTkyLCJhdXRoIjoiUk9MRV9VU0VSIiwiaWF0IjoxNzY2NzE3MTkyfQ.g5KbKaJcIDVPTl8kdXHcnA8a9Fvd4hK_fh9nZmvbwTGAV34zeJO0-xQFPKD09MAAK2GR9rG2zt93qdypBPccPg}
+    connect-timeout-ms: 3000
+    read-timeout-ms: 5000
+  # Servicios externos de la cátedra en ZeroTier
+  # Redis: 192.168.194.250:6379 (usado por el servicio proxy)
+  # Kafka: 192.168.194.250:9092 (usado por el servicio proxy)
+  proxy:
+    base-url: ${PROXY_BASE_URL:http://localhost:8081}

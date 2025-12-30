@@ -15,29 +15,36 @@
 
 logging:
   level:
-    ROOT: DEBUG
-    tech.jhipster: DEBUG
-    org.hibernate.SQL: DEBUG
-    com.celi.backend: DEBUG
+    ROOT: INFO
+    tech.jhipster: INFO
+    org.hibernate.SQL: WARN
+    com.celi.backend: INFO
+    org.springframework: INFO
+    org.hibernate: WARN
+    org.apache.kafka: WARN
+    org.springframework.kafka: WARN
+    org.springframework.web: INFO  
+    org.springframework.security: WARN
+    org.springframework.messaging: WARN
+    org.springframework.web.socket: WARN
+    org.springframework.messaging.simp: WARN
+    com.celi.backend.web: DEBUG 
 
 spring:
-  docker:
-    compose:
-      enabled: true
   devtools:
     restart:
       enabled: true
       additional-exclude: static/**
     livereload:
-      enabled: false 
+      enabled: false # we use Webpack dev server + BrowserSync for livereload
   jackson:
     serialization:
       indent-output: true
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
-    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/backend?useUnicode=true&characterEncoding=utf8&useSSL=false&useLegacyDatetimeCode=false&createDatabaseIfNotExist=true}
-    username: ${SPRING_DATASOURCE_USERNAME:root}
-    password: ${SPRING_DATASOURCE_PASSWORD:}
+    url: jdbc:postgresql://localhost:5432/backend
+    username: backend
+    password:
     hikari:
       poolName: Hikari
       auto-commit: false
@@ -46,24 +53,21 @@ spring:
         prepStmtCacheSize: 250
         prepStmtCacheSqlLimit: 2048
         useServerPrepStmts: true
-  jpa:
-    hibernate:
-      ddl-auto: update
   liquibase:
-    contexts: dev
+    # Remove 'faker' if you do not want the sample data to be loaded automatically
+    contexts: dev, faker
   mail:
     host: localhost
     port: 25
     username:
     password:
   messages:
-    cache-duration: PT1S 
+    cache-duration: PT1S # 1 second, see the ISO 8601 standard
   thymeleaf:
     cache: false
 
 server:
   port: 8080
-  forward-headers-strategy: native
 
 # ===================================================================
 # JHipster specific properties
@@ -72,14 +76,15 @@ server:
 # ===================================================================
 
 jhipster:
-  cache:
-    redis: 
-      expiration: 3600 
-      server: ${SPRING_DATA_REDIS_URL:redis://192.168.194.250:6379}
-      cluster: false
+ 
+  # CORS is only enabled by default with the "dev" profile
   cors:
-    allowed-origins: 'http://localhost:8100,https://localhost:8100'
-    allowed-origin-patterns: 'https://*.githubpreview.dev'
+    # Allow Ionic for JHipster by default (* no longer allowed in Spring Boot 2.4+)
+    # Incluye localhost para web y emuladores móviles comunes
+    allowed-origins: 'http://localhost:8100,https://localhost:8100,http://localhost:9000,https://localhost:9000,http://10.0.2.2:8080,http://127.0.0.1:8080'
+    # Enable CORS when running in GitHub Codespaces
+    # Patrones para permitir conexiones desde dispositivos móviles en desarrollo
+    allowed-origin-patterns: 'https://*.githubpreview.dev,http://10.0.2.2:*'
     allowed-methods: '*'
     allowed-headers: '*'
     exposed-headers: 'Authorization,Link,X-Total-Count,X-${jhipster.clientApp.name}-alert,X-${jhipster.clientApp.name}-error,X-${jhipster.clientApp.name}-params'
@@ -88,14 +93,16 @@ jhipster:
   security:
     authentication:
       jwt:
+        # This token must be encoded using Base64 and be at least 256 bits long (you can type `openssl rand -base64 64` on your command line to generate a 512 bits one)
         base64-secret: MjY1NjNlNmM2MDkwMGMxODgxOWYxYjk5NzUwNzhiNGY5ZjY1OTk1NzBiNjdlOGU1MjFkYWVlMTlmMmRhZGI1ZTYwZWM3ZjQ4YjhmZWI1YzNiYzM5ZWExZmI0ODEzOTZmZjc0ZDYwN2M0ODVkYTVhNWM1ZGJhYzE3YTMxZGQ2YTM=
+        # Token is valid 24 hours
         token-validity-in-seconds: 86400
         token-validity-in-seconds-for-remember-me: 2592000
-  mail:
+  mail: # specific JHipster mail property, for standard properties see MailProperties
     base-url: http://127.0.0.1:8080
   logging:
-    use-json-format: false 
-    logstash: 
+    use-json-format: false # By default, logs are not in Json format
+    logstash: # Forward logs to logstash over a socket, used by LoggingConfiguration
       enabled: false
       host: localhost
       port: 5000
@@ -109,9 +116,16 @@ jhipster:
 # https://www.jhipster.tech/common-application-properties/
 # ===================================================================
 
-
 application:
   catedra:
-    # URL proxy (8081)
-    url: ${CATEDRA_URL:http://localhost:8081/api/catedra}
-    token: ${CATEDRA_TOKEN:eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJjZWxpIiwiZXhwIjoxODUyMTU1ODk1LCJhdXRoIjoiUk9MRV9VU0VSIiwiaWF0IjoxNzY1NzU1ODk1fQ.tWWddUK0tnteN_iGvIoECKvRa2Q6cnBk8c_tV8E43iDZv2x8VSp-MygUDLQ76_5RdjOsZwk9kXDWBWmKhVZ8Mw}
+    # Servicio de la cátedra en red ZeroTier (192.168.194.0/24)
+    base-url: http://192.168.194.250:8080
+    registration-endpoint: /api/v1/agregar_usuario
+    auth-token: ${CATEDRA_AUTH_TOKEN:eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJjZWxpIiwiZXhwIjoxODUzMTE3MTkyLCJhdXRoIjoiUk9MRV9VU0VSIiwiaWF0IjoxNzY2NzE3MTkyfQ.g5KbKaJcIDVPTl8kdXHcnA8a9Fvd4hK_fh9nZmvbwTGAV34zeJO0-xQFPKD09MAAK2GR9rG2zt93qdypBPccPg}
+    connect-timeout-ms: 5000
+    read-timeout-ms: 10000
+  # Servicios externos de la cátedra en ZeroTier
+  # Redis: 192.168.194.250:6379 (usado por el servicio proxy)
+  # Kafka: 192.168.194.250:9092 (usado por el servicio proxy)
+  proxy:
+    base-url: ${PROXY_BASE_URL:http://localhost:8081}

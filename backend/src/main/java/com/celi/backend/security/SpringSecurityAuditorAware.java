@@ -1,9 +1,10 @@
 package com.celi.backend.security;
 
-import com.celi.backend.config.Constants;
 import java.util.Optional;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.stereotype.Component;
+
+import com.celi.backend.config.Constants;
 
 /**
  * Implementation of {@link AuditorAware} based on Spring Security.

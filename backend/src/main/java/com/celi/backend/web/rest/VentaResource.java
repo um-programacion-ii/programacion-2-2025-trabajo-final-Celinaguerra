@@ -1,199 +1,171 @@
 package com.celi.backend.web.rest;
 
-import com.celi.backend.repository.VentaRepository;
-import com.celi.backend.service.VentaService;
-import com.celi.backend.service.dto.VentaDTO;
-import com.celi.backend.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import tech.jhipster.web.util.HeaderUtil;
-import tech.jhipster.web.util.PaginationUtil;
-import tech.jhipster.web.util.ResponseUtil;
 
-/**
- * REST controller for managing {@link com.celi.backend.domain.Venta}.
- */
+import com.celi.backend.domain.User;
+import com.celi.backend.domain.Venta;
+import com.celi.backend.repository.UserRepository;
+import com.celi.backend.repository.VentaRepository;
+import com.celi.backend.security.SecurityUtils;
+import com.celi.backend.service.dto.VentaRequestDTO;
+import com.celi.backend.service.dto.VentaResponseDTO;
+import com.celi.backend.service.dto.VentaResumenDTO;
+import com.celi.backend.service.venta.VentaService;
+
 @RestController
 @RequestMapping("/api/ventas")
+@PreAuthorize("isAuthenticated()")
 public class VentaResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(VentaResource.class);
 
-    private static final String ENTITY_NAME = "venta";
-
-    @Value("${jhipster.clientApp.name}")
-    private String applicationName;
-
     private final VentaService ventaService;
-
     private final VentaRepository ventaRepository;
+    private final UserRepository userRepository;
 
-    public VentaResource(VentaService ventaService, VentaRepository ventaRepository) {
+    public VentaResource(
+            VentaService ventaService,
+            VentaRepository ventaRepository,
+            UserRepository userRepository) {
         this.ventaService = ventaService;
         this.ventaRepository = ventaRepository;
+        this.userRepository = userRepository;
     }
 
     /**
-     * {@code POST  /ventas} : Create a new venta.
+     * {@code POST  /ventas} : Procesa una nueva venta.
      *
-     * @param ventaDTO the ventaDTO to create.
-     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with
-     *         body the new ventaDTO, or with status {@code 400 (Bad Request)} if
-     *         the venta has already an ID.
-     * @throws URISyntaxException if the Location URI syntax is incorrect.
+     * @param request el DTO de la venta a procesar.
+     * @return el {@link ResponseEntity} con status {@code 201 (Created)} y con el
+     *         cuerpo de la venta procesada.
      */
-    @PostMapping("")
-    public ResponseEntity<VentaDTO> createVenta(@Valid @RequestBody VentaDTO ventaDTO) throws URISyntaxException {
-        LOG.debug("REST request to save Venta : {}", ventaDTO);
-        if (ventaDTO.getId() != null) {
-            throw new BadRequestAlertException("A new venta cannot already have an ID", ENTITY_NAME, "idexists");
+    @PostMapping
+    public ResponseEntity<VentaResponseDTO> procesarVenta(@Valid @RequestBody VentaRequestDTO request) {
+        String userLogin = SecurityUtils.getCurrentUserLogin().orElseThrow();
+        LOG.debug("REST request para procesar venta: eventoId={}, usuario={}", request.getEventoId(), userLogin);
+
+        try {
+            VentaResponseDTO respuesta = ventaService.procesarVenta(request, userLogin);
+            return ResponseEntity.status(HttpStatus.CREATED).body(respuesta);
+        } catch (IllegalArgumentException e) {
+            LOG.warn("Error de validación al procesar venta: {}", e.getMessage());
+            VentaResponseDTO error = new VentaResponseDTO();
+            error.setResultado("FALLIDA");
+            error.setMensaje(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        } catch (IllegalStateException e) {
+            LOG.warn("Error de estado al procesar venta: {}", e.getMessage());
+            VentaResponseDTO error = new VentaResponseDTO();
+            error.setResultado("FALLIDA");
+            error.setMensaje(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+        } catch (Exception e) {
+            LOG.error("Error inesperado al procesar venta", e);
+            VentaResponseDTO error = new VentaResponseDTO();
+            error.setResultado("FALLIDA");
+            error.setMensaje("Error interno al procesar la venta");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
         }
-        ventaDTO = ventaService.save(ventaDTO);
-        return ResponseEntity.created(new URI("/api/ventas/" + ventaDTO.getId()))
-                .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME,
-                        ventaDTO.getId().toString()))
-                .body(ventaDTO);
     }
 
     /**
-     * {@code PUT  /ventas/:id} : Updates an existing venta.
+     * {@code GET  /ventas} : Obtiene todas las ventas del usuario autenticado.
      *
-     * @param id       the id of the ventaDTO to save.
-     * @param ventaDTO the ventaDTO to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body
-     *         the updated ventaDTO,
-     *         or with status {@code 400 (Bad Request)} if the ventaDTO is not
-     *         valid,
-     *         or with status {@code 500 (Internal Server Error)} if the ventaDTO
-     *         couldn't be updated.
-     * @throws URISyntaxException if the Location URI syntax is incorrect.
+     * @return el {@link ResponseEntity} con status {@code 200 (OK)} y la lista de
+     *         ventas resumidas.
      */
-    @PutMapping("/{id}")
-    public ResponseEntity<VentaDTO> updateVenta(
-            @PathVariable(value = "id", required = false) final Long id,
-            @Valid @RequestBody VentaDTO ventaDTO) throws URISyntaxException {
-        LOG.debug("REST request to update Venta : {}, {}", id, ventaDTO);
-        if (ventaDTO.getId() == null) {
-            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
-        }
-        if (!Objects.equals(id, ventaDTO.getId())) {
-            throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
+    @GetMapping
+    public ResponseEntity<List<VentaResumenDTO>> obtenerVentas() {
+        String userLogin = SecurityUtils.getCurrentUserLogin().orElseThrow();
+        LOG.debug("REST request para obtener ventas del usuario: {}", userLogin);
+
+        Optional<User> userOpt = userRepository.findOneByLogin(userLogin);
+        if (userOpt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
 
-        if (!ventaRepository.existsById(id)) {
-            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
-        }
+        List<Venta> ventas = ventaRepository.findByUsuarioOrderByFechaVentaDesc(userOpt.get());
+        List<VentaResumenDTO> ventasDTO = ventas.stream()
+                .map(this::convertirAVentaResumenDTO)
+                .collect(Collectors.toList());
 
-        ventaDTO = ventaService.update(ventaDTO);
-        return ResponseEntity.ok()
-                .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME,
-                        ventaDTO.getId().toString()))
-                .body(ventaDTO);
+        return ResponseEntity.ok(ventasDTO);
     }
 
     /**
-     * {@code PATCH  /ventas/:id} : Partial updates given fields of an existing
-     * venta, field will ignore if it is null
+     * {@code GET  /ventas/:id} : Obtiene el detalle de una venta específica.
      *
-     * @param id       the id of the ventaDTO to save.
-     * @param ventaDTO the ventaDTO to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body
-     *         the updated ventaDTO,
-     *         or with status {@code 400 (Bad Request)} if the ventaDTO is not
-     *         valid,
-     *         or with status {@code 404 (Not Found)} if the ventaDTO is not found,
-     *         or with status {@code 500 (Internal Server Error)} if the ventaDTO
-     *         couldn't be updated.
-     * @throws URISyntaxException if the Location URI syntax is incorrect.
-     */
-    @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
-    public ResponseEntity<VentaDTO> partialUpdateVenta(
-            @PathVariable(value = "id", required = false) final Long id,
-            @NotNull @RequestBody VentaDTO ventaDTO) throws URISyntaxException {
-        LOG.debug("REST request to partial update Venta partially : {}, {}", id, ventaDTO);
-        if (ventaDTO.getId() == null) {
-            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
-        }
-        if (!Objects.equals(id, ventaDTO.getId())) {
-            throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
-        }
-
-        if (!ventaRepository.existsById(id)) {
-            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
-        }
-
-        Optional<VentaDTO> result = ventaService.partialUpdate(ventaDTO);
-
-        return ResponseUtil.wrapOrNotFound(
-                result,
-                HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, ventaDTO.getId().toString()));
-    }
-
-    /**
-     * {@code GET  /ventas} : get all the ventas.
-     *
-     * @param pageable  the pagination information.
-     * @param eagerload flag to eager load entities from relationships (This is
-     *                  applicable for many-to-many).
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list
-     *         of ventas in body.
-     */
-    @GetMapping("")
-    public ResponseEntity<List<VentaDTO>> getAllVentas(
-            @org.springdoc.core.annotations.ParameterObject Pageable pageable,
-            @RequestParam(name = "eagerload", required = false, defaultValue = "true") boolean eagerload) {
-        LOG.debug("REST request to get a page of Ventas");
-        Page<VentaDTO> page;
-        if (eagerload) {
-            page = ventaService.findAllWithEagerRelationships(pageable);
-        } else {
-            page = ventaService.findAll(pageable);
-        }
-        HttpHeaders headers = PaginationUtil
-                .generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
-        return ResponseEntity.ok().headers(headers).body(page.getContent());
-    }
-
-    /**
-     * {@code GET  /ventas/:id} : get the "id" venta.
-     *
-     * @param id the id of the ventaDTO to retrieve.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body
-     *         the ventaDTO, or with status {@code 404 (Not Found)}.
+     * @param id el id de la venta.
+     * @return el {@link ResponseEntity} con status {@code 200 (OK)} y el cuerpo de
+     *         la venta, o con status {@code 404 (Not Found)}.
      */
     @GetMapping("/{id}")
-    public ResponseEntity<VentaDTO> getVenta(@PathVariable("id") Long id) {
-        LOG.debug("REST request to get Venta : {}", id);
-        Optional<VentaDTO> ventaDTO = ventaService.findOne(id);
-        return ResponseUtil.wrapOrNotFound(ventaDTO);
+    public ResponseEntity<VentaResponseDTO> obtenerVenta(@PathVariable Long id) {
+        String userLogin = SecurityUtils.getCurrentUserLogin().orElseThrow();
+        LOG.debug("REST request para obtener venta id: {}, usuario: {}", id, userLogin);
+
+        Optional<User> userOpt = userRepository.findOneByLogin(userLogin);
+        if (userOpt.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        Venta venta = ventaRepository.findByIdAndUsuario(id, userOpt.get());
+        if (venta == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        VentaResponseDTO dto = convertirAVentaResponseDTO(venta);
+        return ResponseEntity.ok(dto);
     }
 
     /**
-     * {@code DELETE  /ventas/:id} : delete the "id" venta.
-     *
-     * @param id the id of the ventaDTO to delete.
-     * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
+     * Convierte una entidad Venta a VentaResumenDTO.
      */
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteVenta(@PathVariable("id") Long id) {
-        LOG.debug("REST request to delete Venta : {}", id);
-        ventaService.delete(id);
-        return ResponseEntity.noContent()
-                .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
-                .build();
+    private VentaResumenDTO convertirAVentaResumenDTO(Venta venta) {
+        VentaResumenDTO dto = new VentaResumenDTO();
+        dto.setId(venta.getId());
+        dto.setEventoId(venta.getEventoId());
+        dto.setFechaVenta(venta.getFechaVenta());
+        dto.setPrecioVenta(venta.getPrecioVenta());
+        dto.setResultado(venta.getResultado().name());
+        dto.setCantidadAsientos(venta.getAsientos() != null ? venta.getAsientos().size() : 0);
+        return dto;
+    }
+
+    /**
+     * Convierte una entidad Venta a VentaResponseDTO.
+     */
+    private VentaResponseDTO convertirAVentaResponseDTO(Venta venta) {
+        VentaResponseDTO dto = new VentaResponseDTO();
+        dto.setId(venta.getId());
+        dto.setVentaIdCatedra(venta.getVentaIdCatedra());
+        dto.setEventoId(venta.getEventoId());
+        dto.setFechaVenta(venta.getFechaVenta());
+        dto.setPrecioVenta(venta.getPrecioVenta());
+        dto.setResultado(venta.getResultado().name());
+        dto.setMensaje(venta.getMensaje());
+
+        dto.setAsientos(
+                venta.getAsientos().stream()
+                        .map(a -> {
+                            VentaResponseDTO.AsientoVentaDTO asientoDTO = new VentaResponseDTO.AsientoVentaDTO();
+                            asientoDTO.setFila(a.getFila());
+                            asientoDTO.setNumero(a.getNumero());
+                            asientoDTO.setNombrePersona(a.getNombrePersona());
+                            asientoDTO.setApellidoPersona(a.getApellidoPersona());
+                            return asientoDTO;
+                        })
+                        .collect(Collectors.toList()));
+
+        return dto;
     }
 }

@@ -1,8 +1,9 @@
 package com.celi.backend.service.dto;
 
-import com.celi.backend.domain.User;
 import java.io.Serializable;
 import java.util.Objects;
+
+import com.celi.backend.domain.User;
 
 /**
  * A DTO representing a user, with only the public attributes.
@@ -67,8 +68,8 @@ public class UserDTO implements Serializable {
     @Override
     public String toString() {
         return "UserDTO{" +
-            "id='" + id + '\'' +
-            ", login='" + login + '\'' +
-            "}";
+                "id='" + id + '\'' +
+                ", login='" + login + '\'' +
+                "}";
     }
 }

@@ -17,20 +17,21 @@ public class JacksonConfiguration {
 
     /**
      * Support for Java date and time API.
+     * 
      * @return the corresponding Jackson module.
      */
     @Bean
     public JavaTimeModule javaTimeModule() {
         final JavaTimeModule javaTime = new JavaTimeModule();
         javaTime.addSerializer(
-            LocalTime.class,
-            new JsonSerializer<LocalTime>() {
-                @Override
-                public void serialize(LocalTime value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
-                    gen.writeString(value.toString());
-                }
-            }
-        );
+                LocalTime.class,
+                new JsonSerializer<LocalTime>() {
+                    @Override
+                    public void serialize(LocalTime value, JsonGenerator gen, SerializerProvider serializers)
+                            throws IOException {
+                        gen.writeString(value.toString());
+                    }
+                });
         return javaTime;
     }
 

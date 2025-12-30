@@ -91,8 +91,30 @@ management:
       application: ${spring.application.name}
 
 spring:
+  autoconfigure:
+    exclude: org.springframework.boot.actuate.autoconfigure.metrics.jdbc.DataSourcePoolMetricsAutoConfiguration
   application:
     name: backend
+  cloud:
+    function:
+      definition: kafkaConsumer;kafkaProducer
+    stream:
+      kafka:
+        binder:
+          replicationFactor: 1
+          auto-create-topics: true
+          brokers: localhost:9092
+      bindings:
+        binding-out-0:
+          content-type: text/plain
+          group: backend
+        kafkaConsumer-in-0:
+          destination: sse-topic
+          content-type: text/plain
+          group: backend
+        kafkaProducer-out-0:
+          content-type: text/plain
+          group: backend
   docker:
     compose:
       enabled: true
@@ -167,17 +189,6 @@ spring:
     ansi:
       console-available: true
 
-  kafka:
-    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:192.168.194.250:9092}
-    consumer:
-      key.deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value.deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      group.id: backend
-      auto.offset.reset: earliest
-    producer:
-      key.serializer: org.apache.kafka.common.serialization.StringSerializer
-      value.serializer: org.apache.kafka.common.serialization.StringSerializer
-
 server:
   servlet:
     session:
@@ -224,8 +235,7 @@ jhipster:
     license: unlicensed
     license-url:
   security:
-
-
+    content-security-policy: "default-src 'self'; frame-src 'self' data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://storage.googleapis.com; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:"
 
 # jhipster-needle-add-application-yaml-document
 ---

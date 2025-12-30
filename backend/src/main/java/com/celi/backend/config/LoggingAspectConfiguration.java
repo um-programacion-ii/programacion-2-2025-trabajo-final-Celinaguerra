@@ -1,8 +1,10 @@
 package com.celi.backend.config;
 
-import com.celi.backend.aop.logging.LoggingAspect;
 import org.springframework.context.annotation.*;
 import org.springframework.core.env.Environment;
+
+import com.celi.backend.aop.logging.LoggingAspect;
+
 import tech.jhipster.config.JHipsterConstants;
 
 @Configuration

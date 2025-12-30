@@ -1,31 +1,21 @@
 package com.celi.backend.web.rest;
 
-import com.celi.backend.repository.EventoRepository;
-import com.celi.backend.service.EventoService;
-import com.celi.backend.service.dto.EventoDTO;
-import com.celi.backend.web.rest.errors.BadRequestAlertException;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import tech.jhipster.web.util.HeaderUtil;
-import tech.jhipster.web.util.PaginationUtil;
-import tech.jhipster.web.util.ResponseUtil;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.celi.backend.service.EventoQueryService;
+import com.celi.backend.service.dto.EventoDetalleDTO;
+import com.celi.backend.service.dto.EventoResumenDTO;
 
 /**
- * REST controller for managing {@link com.celi.backend.domain.Evento}.
+ * REST controller para leer eventos (listado y detalle).
  */
 @RestController
 @RequestMapping("/api/eventos")
@@ -33,208 +23,46 @@ public class EventoResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(EventoResource.class);
 
-    private static final String ENTITY_NAME = "evento";
+    private final EventoQueryService eventoQueryService;
 
-    @Value("${jhipster.clientApp.name}")
-    private String applicationName;
-
-    private final EventoService eventoService;
-
-    private final EventoRepository eventoRepository;
-
-    public EventoResource(EventoService eventoService, EventoRepository eventoRepository) {
-        this.eventoService = eventoService;
-        this.eventoRepository = eventoRepository;
+    public EventoResource(EventoQueryService eventoQueryService) {
+        this.eventoQueryService = eventoQueryService;
     }
 
     /**
-     * {@code POST  /eventos} : Create a new evento.
-     *
-     * @param eventoDTO the eventoDTO to create.
-     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with
-     *         body the new eventoDTO, or with status {@code 400 (Bad Request)} if
-     *         the evento has already an ID.
-     * @throws URISyntaxException if the Location URI syntax is incorrect.
+     * {@code GET /api/eventos} : listado de eventos activos (no cancelados y no
+     * expirados).
      */
-    @PostMapping("")
-    public ResponseEntity<EventoDTO> createEvento(@Valid @RequestBody EventoDTO eventoDTO) throws URISyntaxException {
-        LOG.debug("REST request to save Evento : {}", eventoDTO);
-        if (eventoDTO.getId() != null) {
-            throw new BadRequestAlertException("A new evento cannot already have an ID", ENTITY_NAME, "idexists");
-        }
-        eventoDTO = eventoService.save(eventoDTO);
-        return ResponseEntity.created(new URI("/api/eventos/" + eventoDTO.getId()))
-                .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME,
-                        eventoDTO.getId().toString()))
-                .body(eventoDTO);
+    @GetMapping
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<List<EventoResumenDTO>> listarEventos() {
+        LOG.debug("REST request to get active events");
+        List<EventoResumenDTO> eventos = eventoQueryService.obtenerEventosActivos();
+        return ResponseEntity.ok(eventos);
     }
 
     /**
-     * {@code PUT  /eventos/:id} : Updates an existing evento.
-     *
-     * @param id        the id of the eventoDTO to save.
-     * @param eventoDTO the eventoDTO to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body
-     *         the updated eventoDTO,
-     *         or with status {@code 400 (Bad Request)} if the eventoDTO is not
-     *         valid,
-     *         or with status {@code 500 (Internal Server Error)} if the eventoDTO
-     *         couldn't be updated.
-     * @throws URISyntaxException if the Location URI syntax is incorrect.
-     */
-    @PutMapping("/{id}")
-    public ResponseEntity<EventoDTO> updateEvento(
-            @PathVariable(value = "id", required = false) final Long id,
-            @Valid @RequestBody EventoDTO eventoDTO) throws URISyntaxException {
-        LOG.debug("REST request to update Evento : {}, {}", id, eventoDTO);
-        if (eventoDTO.getId() == null) {
-            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
-        }
-        if (!Objects.equals(id, eventoDTO.getId())) {
-            throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
-        }
-
-        if (!eventoRepository.existsById(id)) {
-            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
-        }
-
-        eventoDTO = eventoService.update(eventoDTO);
-        return ResponseEntity.ok()
-                .headers(HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME,
-                        eventoDTO.getId().toString()))
-                .body(eventoDTO);
-    }
-
-    /**
-     * {@code PATCH  /eventos/:id} : Partial updates given fields of an existing
-     * evento, field will ignore if it is null
-     *
-     * @param id        the id of the eventoDTO to save.
-     * @param eventoDTO the eventoDTO to update.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body
-     *         the updated eventoDTO,
-     *         or with status {@code 400 (Bad Request)} if the eventoDTO is not
-     *         valid,
-     *         or with status {@code 404 (Not Found)} if the eventoDTO is not found,
-     *         or with status {@code 500 (Internal Server Error)} if the eventoDTO
-     *         couldn't be updated.
-     * @throws URISyntaxException if the Location URI syntax is incorrect.
-     */
-    @PatchMapping(value = "/{id}", consumes = { "application/json", "application/merge-patch+json" })
-    public ResponseEntity<EventoDTO> partialUpdateEvento(
-            @PathVariable(value = "id", required = false) final Long id,
-            @NotNull @RequestBody EventoDTO eventoDTO) throws URISyntaxException {
-        LOG.debug("REST request to partial update Evento partially : {}, {}", id, eventoDTO);
-        if (eventoDTO.getId() == null) {
-            throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
-        }
-        if (!Objects.equals(id, eventoDTO.getId())) {
-            throw new BadRequestAlertException("Invalid ID", ENTITY_NAME, "idinvalid");
-        }
-
-        if (!eventoRepository.existsById(id)) {
-            throw new BadRequestAlertException("Entity not found", ENTITY_NAME, "idnotfound");
-        }
-
-        Optional<EventoDTO> result = eventoService.partialUpdate(eventoDTO);
-
-        return ResponseUtil.wrapOrNotFound(
-                result,
-                HeaderUtil.createEntityUpdateAlert(applicationName, false, ENTITY_NAME, eventoDTO.getId().toString()));
-    }
-
-    /**
-     * {@code GET  /eventos} : get all the eventos.
-     *
-     * @param pageable  the pagination information.
-     * @param eagerload flag to eager load entities from relationships (This is
-     *                  applicable for many-to-many).
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list
-     *         of eventos in body.
-     */
-    @GetMapping("")
-    public ResponseEntity<List<EventoDTO>> getAllEventos(
-            @org.springdoc.core.annotations.ParameterObject Pageable pageable,
-            @RequestParam(name = "eagerload", required = false, defaultValue = "true") boolean eagerload) {
-        LOG.debug("REST request to get a page of Eventos");
-        Page<EventoDTO> page;
-        if (eagerload) {
-            page = eventoService.findAllWithEagerRelationships(pageable);
-        } else {
-            page = eventoService.findAll(pageable);
-        }
-        HttpHeaders headers = PaginationUtil
-                .generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
-        return ResponseEntity.ok().headers(headers).body(page.getContent());
-    }
-
-    /**
-     * {@code GET  /eventos/:id} : get the "id" evento.
-     *
-     * @param id the id of the eventoDTO to retrieve.
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body
-     *         the eventoDTO, or with status {@code 404 (Not Found)}.
+     * {@code GET /api/eventos/:id} : detalle de un evento activo (no cancelado y no
+     * expirado).
      */
     @GetMapping("/{id}")
-    public ResponseEntity<EventoDTO> getEvento(@PathVariable("id") Long id) {
-        LOG.debug("REST request to get Evento : {}", id);
-        Optional<EventoDTO> eventoDTO = eventoService.findOne(id);
-        return ResponseUtil.wrapOrNotFound(eventoDTO);
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<EventoDetalleDTO> obtenerDetalle(@PathVariable Long id) {
+        LOG.debug("REST request to get event detail : {}", id);
+        return eventoQueryService.obtenerDetalleEvento(id).map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     /**
-     * {@code DELETE  /eventos/:id} : delete the "id" evento.
-     *
-     * @param id the id of the eventoDTO to delete.
-     * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
+     * {@code GET /api/eventos/catedra/:eventoIdCatedra/dimensiones} : obtiene las
+     * dimensiones (filas y columnas) de un evento por su ID de cÃ¡tedra.
      */
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteEvento(@PathVariable("id") Long id) {
-        LOG.debug("REST request to delete Evento : {}", id);
-        eventoService.delete(id);
-        return ResponseEntity.noContent()
-                .headers(HeaderUtil.createEntityDeletionAlert(applicationName, false, ENTITY_NAME, id.toString()))
-                .build();
-    }
-
-    /**
-     * {@code GET  /eventos-resumidos} : Get all eventos with summarized data
-     * (Payload 3).
-     * Returns only essential fields for listing: titulo, resumen, descripcion,
-     * fecha, precioEntrada, eventoTipo.
-     *
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list
-     *         of summarized eventos.
-     */
-    @GetMapping("/eventos-resumidos")
-    public ResponseEntity<List<com.celi.backend.service.dto.EventoResumidoDTO>> getAllEventosResumidos() {
-        LOG.debug("REST request to get all Eventos (resumidos)");
-        List<com.celi.backend.service.dto.EventoResumidoDTO> eventos = eventoService.findAllResumidos();
-        return ResponseEntity.ok().body(eventos);
-    }
-
-    /**
-     * {@code POST  /eventos/sync-notification} : Receive notification from proxy
-     * about event update.
-     * Triggers synchronization of the specified event from Cátedra.
-     *
-     * @param notification the notification containing evento ID
-     * @return the {@link ResponseEntity} with status {@code 200 (OK)}
-     */
-    @PostMapping("/sync-notification")
-    public ResponseEntity<Void> syncNotification(
-            @RequestBody com.celi.backend.service.dto.EventoSyncNotificationDTO notification) {
-        LOG.info("📨 Received sync notification from proxy for evento ID: {}", notification.getEventoId());
-
-        try {
-            // Trigger sync for the specific event
-            eventoService.findOne(notification.getEventoId());
-            LOG.info("✅ Event {} synchronized successfully from proxy notification", notification.getEventoId());
-        } catch (Exception e) {
-            LOG.error("❌ Failed to sync event {} from proxy notification: {}", notification.getEventoId(),
-                    e.getMessage());
-        }
-
-        return ResponseEntity.ok().build();
+    @GetMapping("/catedra/{eventoIdCatedra}/dimensiones")
+    @PreAuthorize("permitAll()")
+    public ResponseEntity<java.util.Map<String, Integer>> obtenerDimensiones(@PathVariable Long eventoIdCatedra) {
+        LOG.debug("REST request to get event dimensions for eventoIdCatedra: {}", eventoIdCatedra);
+        return eventoQueryService.obtenerDimensionesEvento(eventoIdCatedra)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 }
