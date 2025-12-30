@@ -1,51 +1,72 @@
-package com.celi.proxy.service;
+package com.um.eventosproxy.service;
 
-import com.celi.proxy.config.ApplicationProperties;
-import lombok.extern.slf4j.Slf4j;
+import com.um.eventosproxy.config.ProxyProperties;
+import com.um.eventosproxy.dto.NotificacionEventoDTO;
+import java.util.concurrent.CompletableFuture;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.HashMap;
-import java.util.Map;
-
-/**
- * Notifica al backend cuando los eventos se actualizan via Kafka.
- */
 @Service
-@Slf4j
 public class BackendNotificationService {
 
-    private final RestTemplate restTemplate;
-    private final ApplicationProperties applicationProperties;
+    private static final Logger LOG = LoggerFactory.getLogger(BackendNotificationService.class);
+    private static final String NOTIFICATION_ENDPOINT = "/api/admin/eventos/notificacion";
 
-    public BackendNotificationService(RestTemplate restTemplate, ApplicationProperties applicationProperties) {
+    private final RestTemplate restTemplate;
+    private final ProxyProperties proxyProperties;
+    private final JwtService jwtService;
+
+    public BackendNotificationService(
+        RestTemplate restTemplate,
+        ProxyProperties proxyProperties,
+        JwtService jwtService
+    ) {
         this.restTemplate = restTemplate;
-        this.applicationProperties = applicationProperties;
+        this.proxyProperties = proxyProperties;
+        this.jwtService = jwtService;
     }
 
-    public void notifyEventUpdate(Long eventoId) {
-        String backendUrl = applicationProperties.getBackend().getUrl();
-        String notificationUrl = backendUrl + "/api/eventos/sync-notification";
-
-        log.info("Notificando backend de actualizacion de evento: eventoId={}", eventoId);
+    @Async
+    public CompletableFuture<Void> notificarCambioEvento(NotificacionEventoDTO notificacion) {
+        LOG.info("Notificando cambio de evento al backend: eventoId={}, tipoCambio={}", 
+            notificacion.getEventoIdCatedra(), notificacion.getTipoCambio());
 
         try {
-            Map<String, Object> payload = new HashMap<>();
-            payload.put("eventoId", eventoId);
-            payload.put("source", "kafka");
+            String url = proxyProperties.getBackend().getBaseUrl() + NOTIFICATION_ENDPOINT;
+            String token = jwtService.generateToken("proxy-service");
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
-            HttpEntity<Map<String, Object>> request = new HttpEntity<>(payload, headers);
+            headers.setBearerAuth(token);
 
-            restTemplate.postForEntity(notificationUrl, request, Void.class);
+            HttpEntity<NotificacionEventoDTO> request = new HttpEntity<>(notificacion, headers);
 
-            log.info("Backend notificado para evento ID: {}", eventoId);
+            ResponseEntity<Void> response = restTemplate.exchange(
+                url,
+                HttpMethod.POST,
+                request,
+                Void.class
+            );
+
+            if (response.getStatusCode().is2xxSuccessful()) {
+                LOG.info("Notificación enviada exitosamente al backend");
+            } else {
+                LOG.warn("Backend respondió con código no exitoso: {}", response.getStatusCode());
+            }
+
+            return CompletableFuture.completedFuture(null);
         } catch (Exception e) {
-            log.error("Error al notificar backend para evento ID {}: {}", eventoId, e.getMessage());
+            LOG.error("Error al notificar cambio de evento al backend", e);
+            return CompletableFuture.failedFuture(e);
         }
     }
 }
+
