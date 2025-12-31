@@ -11,13 +11,12 @@ public class InvalidPasswordException extends ErrorResponseException {
 
     public InvalidPasswordException() {
         super(
-            HttpStatus.BAD_REQUEST,
-            ProblemDetailWithCauseBuilder.instance()
-                .withStatus(HttpStatus.BAD_REQUEST.value())
-                .withType(ErrorConstants.INVALID_PASSWORD_TYPE)
-                .withTitle("Incorrect password")
-                .build(),
-            null
-        );
+                HttpStatus.BAD_REQUEST,
+                ProblemDetailWithCauseBuilder.instance()
+                        .withStatus(HttpStatus.BAD_REQUEST.value())
+                        .withType(ErrorConstants.INVALID_PASSWORD_TYPE)
+                        .withTitle("Incorrect password")
+                        .build(),
+                null);
     }
 }

@@ -2,44 +2,47 @@ package com.celi.backend.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import java.io.Serializable;
+import java.util.Objects;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 /**
- * A Integrante.
+ * Integrante o participante de un evento
  */
 @Entity
 @Table(name = "integrante")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-@SuppressWarnings("common-java:DuplicatedBlocks")
+@JsonIgnoreProperties(value = { "new", "id" })
 public class Integrante implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "integrante_seq")
+    @SequenceGenerator(name = "integrante_seq", sequenceName = "integrante_seq", allocationSize = 1)
     private Long id;
 
-    @Column(name = "nombre")
+    @Size(max = 200)
+    @Column(name = "nombre", length = 200)
     private String nombre;
 
-    @Column(name = "apellido")
-    private String apellido;
+    @Size(max = 500)
+    @Column(name = "descripcion", length = 500)
+    private String descripcion;
 
-    @Column(name = "identificacion")
-    private String identificacion;
+    @Size(max = 500)
+    @Column(name = "imagen_url", length = 500)
+    private String imagenUrl;
 
-    // Evento relationship removed for ManyToMany unidirectional/owner-side refactor
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "evento_id")
+    @JsonIgnoreProperties(value = { "integrantes", "tipo" }, allowSetters = true)
+    private Evento evento;
 
     public Long getId() {
-        return this.id;
-    }
-
-    public Integrante id(Long id) {
-        this.setId(id);
-        return this;
+        return id;
     }
 
     public void setId(Long id) {
@@ -47,46 +50,36 @@ public class Integrante implements Serializable {
     }
 
     public String getNombre() {
-        return this.nombre;
-    }
-
-    public Integrante nombre(String nombre) {
-        this.setNombre(nombre);
-        return this;
+        return nombre;
     }
 
     public void setNombre(String nombre) {
         this.nombre = nombre;
     }
 
-    public String getApellido() {
-        return this.apellido;
+    public String getDescripcion() {
+        return descripcion;
     }
 
-    public Integrante apellido(String apellido) {
-        this.setApellido(apellido);
-        return this;
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
     }
 
-    public void setApellido(String apellido) {
-        this.apellido = apellido;
+    public String getImagenUrl() {
+        return imagenUrl;
     }
 
-    public String getIdentificacion() {
-        return this.identificacion;
+    public void setImagenUrl(String imagenUrl) {
+        this.imagenUrl = imagenUrl;
     }
 
-    public Integrante identificacion(String identificacion) {
-        this.setIdentificacion(identificacion);
-        return this;
+    public Evento getEvento() {
+        return evento;
     }
 
-    public void setIdentificacion(String identificacion) {
-        this.identificacion = identificacion;
+    public void setEvento(Evento evento) {
+        this.evento = evento;
     }
-
-    // jhipster-needle-entity-add-getters-setters - JHipster will add getters and
-    // setters here
 
     @Override
     public boolean equals(Object o) {
@@ -96,24 +89,16 @@ public class Integrante implements Serializable {
         if (!(o instanceof Integrante)) {
             return false;
         }
-        return getId() != null && getId().equals(((Integrante) o).getId());
+        return id != null && id.equals(((Integrante) o).id);
     }
 
     @Override
     public int hashCode() {
-        // see
-        // https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
-        return getClass().hashCode();
+        return Objects.hashCode(id);
     }
 
-    // prettier-ignore
     @Override
     public String toString() {
-        return "Integrante{" +
-                "id=" + getId() +
-                ", nombre='" + getNombre() + "'" +
-                ", apellido='" + getApellido() + "'" +
-                ", identificacion='" + getIdentificacion() + "'" +
-                "}";
+        return "Integrante{" + "id=" + id + ", nombre='" + nombre + '\'' + ", descripcion='" + descripcion + '\'' + '}';
     }
 }

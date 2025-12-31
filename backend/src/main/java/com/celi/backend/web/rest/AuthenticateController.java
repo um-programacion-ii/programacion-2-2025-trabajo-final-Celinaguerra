@@ -1,13 +1,15 @@
 package com.celi.backend.web.rest;
 
+import com.celi.backend.security.DomainUserDetailsService.UserWithId;
+import com.celi.backend.web.rest.vm.LoginVM;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import jakarta.validation.Valid;
+
 import static com.celi.backend.security.SecurityUtils.AUTHORITIES_CLAIM;
 import static com.celi.backend.security.SecurityUtils.JWT_ALGORITHM;
 import static com.celi.backend.security.SecurityUtils.USER_ID_CLAIM;
 
-import com.celi.backend.security.DomainUserDetailsService.UserWithId;
-import com.celi.backend.web.rest.vm.LoginVM;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.validation.Valid;
 import java.security.Principal;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -29,7 +31,6 @@ import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.web.bind.annotation.*;
 
-/* resuelto en jhipster */
 /**
  * Controller to authenticate users.
  */

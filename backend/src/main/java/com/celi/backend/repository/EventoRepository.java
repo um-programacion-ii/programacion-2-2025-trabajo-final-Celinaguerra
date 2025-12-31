@@ -1,37 +1,39 @@
 package com.celi.backend.repository;
 
-import com.celi.backend.domain.Evento;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.*;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import com.celi.backend.domain.Evento;
+
 /**
- * Spring Data JPA repository for the Evento entity.
+ * Spring Data JPA repository for the {@link Evento} entity.
  */
 @Repository
 public interface EventoRepository extends JpaRepository<Evento, Long> {
-    default Optional<Evento> findOneWithEagerRelationships(Long id) {
-        return this.findOneWithToOneRelationships(id);
-    }
+    /**
+     * Busca un evento por su ID en el servicio de la cátedra
+     */
+    Optional<Evento> findByEventoIdCatedra(Long eventoIdCatedra);
 
-    default List<Evento> findAllWithEagerRelationships() {
-        return this.findAllWithToOneRelationships();
-    }
+    /**
+     * Busca eventos no cancelados y no expirados (fecha >= ahora)
+     */
+    @Query("SELECT e FROM Evento e WHERE e.cancelado = false AND e.fecha >= :ahora ORDER BY e.fecha ASC")
+    List<Evento> findEventosActivos(@Param("ahora") Instant ahora);
 
-    default Page<Evento> findAllWithEagerRelationships(Pageable pageable) {
-        return this.findAllWithToOneRelationships(pageable);
-    }
+    /**
+     * Busca eventos expirados (fecha < ahora)
+     */
+    @Query("SELECT e FROM Evento e WHERE e.fecha < :ahora")
+    List<Evento> findEventosExpirados(@Param("ahora") Instant ahora);
 
-    @Query(value = "select evento from Evento evento left join fetch evento.eventoTipo", countQuery = "select count(evento) from Evento evento")
-    Page<Evento> findAllWithToOneRelationships(Pageable pageable);
-
-    @Query("select evento from Evento evento left join fetch evento.eventoTipo left join fetch evento.integrantes")
-    List<Evento> findAllWithToOneRelationships();
-
-    @Query("select evento from Evento evento left join fetch evento.eventoTipo left join fetch evento.integrantes where evento.id =:id")
-    Optional<Evento> findOneWithToOneRelationships(@Param("id") Long id);
+    /**
+     * Busca eventos cancelados
+     */
+    List<Evento> findByCanceladoTrue();
 }

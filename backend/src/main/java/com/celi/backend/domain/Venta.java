@@ -2,71 +2,108 @@ package com.celi.backend.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.NotNull;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 /**
- * A Venta.
+ * Entidad Venta que representa una venta de asientos para un evento.
  */
 @Entity
 @Table(name = "venta")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-@SuppressWarnings("common-java:DuplicatedBlocks")
-public class Venta implements Serializable {
+public class Venta extends AbstractAuditingEntity<Long> implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "venta_seq")
+    @SequenceGenerator(name = "venta_seq", sequenceName = "venta_seq", allocationSize = 1)
     private Long id;
 
+    /**
+     * ID de la venta en el servicio de la cátedra (si fue confirmada)
+     */
     @Column(name = "venta_id_catedra")
     private Long ventaIdCatedra;
 
+    /**
+     * ID del evento para el cual se realizó la venta
+     */
+    @NotNull
+    @Column(name = "evento_id", nullable = false)
+    private Long eventoId;
+
+    /**
+     * Usuario que realizó la venta
+     */
+    @NotNull
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    @JsonIgnoreProperties(value = { "authorities", "activated" }, allowSetters = true)
+    private User usuario;
+
+    /**
+     * Fecha de la venta
+     */
     @NotNull
     @Column(name = "fecha_venta", nullable = false)
     private Instant fechaVenta;
 
+    /**
+     * Precio total de la venta
+     */
+    @Column(name = "precio_venta", precision = 21, scale = 2)
+    private BigDecimal precioVenta;
+
+    /**
+     * Resultado de la venta: EXITOSA, FALLIDA, PENDIENTE
+     */
     @NotNull
-    @Column(name = "precio_venta", nullable = false)
-    private Double precioVenta;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "resultado", nullable = false, length = 20)
+    private ResultadoVenta resultado;
 
-    @Column(name = "resultado")
-    private Boolean resultado;
+    /**
+     * Mensaje de error o información adicional
+     */
+    @Column(name = "mensaje", length = 500)
+    private String mensaje;
 
-    @Column(name = "descripcion")
-    private String descripcion;
+    /**
+     * Número de intentos de confirmación con la cátedra
+     */
+    @Column(name = "intentos_reintento", nullable = false)
+    private Integer intentosReintento = 0;
 
-    @Column(name = "cantidad_asientos")
-    private Integer cantidadAsientos;
+    /**
+     * Fecha del último intento de reintento
+     */
+    @Column(name = "ultimo_intento_reintento")
+    private Instant ultimoIntentoReintento;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "venta")
+    /**
+     * Asientos asociados a esta venta
+     */
+    @OneToMany(mappedBy = "venta", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     @JsonIgnoreProperties(value = { "venta" }, allowSetters = true)
-    private Set<Asiento> asientos = new HashSet<>();
+    private Set<AsientoVenta> asientos = new HashSet<>();
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    private User user;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JsonIgnoreProperties(value = { "integrantes", "eventoTipo" }, allowSetters = true)
-    private Evento evento;
-
-    // jhipster-needle-entity-add-field - JHipster will add fields here
-
-    public Long getId() {
-        return this.id;
+    public enum ResultadoVenta {
+        EXITOSA,
+        FALLIDA,
+        PENDIENTE
     }
 
-    public Venta id(Long id) {
-        this.setId(id);
-        return this;
+    public Long getId() {
+        return id;
     }
 
     public void setId(Long id) {
@@ -74,141 +111,96 @@ public class Venta implements Serializable {
     }
 
     public Long getVentaIdCatedra() {
-        return this.ventaIdCatedra;
-    }
-
-    public Venta ventaIdCatedra(Long ventaIdCatedra) {
-        this.setVentaIdCatedra(ventaIdCatedra);
-        return this;
+        return ventaIdCatedra;
     }
 
     public void setVentaIdCatedra(Long ventaIdCatedra) {
         this.ventaIdCatedra = ventaIdCatedra;
     }
 
-    public Instant getFechaVenta() {
-        return this.fechaVenta;
+    public Long getEventoId() {
+        return eventoId;
     }
 
-    public Venta fechaVenta(Instant fechaVenta) {
-        this.setFechaVenta(fechaVenta);
-        return this;
+    public void setEventoId(Long eventoId) {
+        this.eventoId = eventoId;
+    }
+
+    public User getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(User usuario) {
+        this.usuario = usuario;
+    }
+
+    public Instant getFechaVenta() {
+        return fechaVenta;
     }
 
     public void setFechaVenta(Instant fechaVenta) {
         this.fechaVenta = fechaVenta;
     }
 
-    public Double getPrecioVenta() {
-        return this.precioVenta;
+    public BigDecimal getPrecioVenta() {
+        return precioVenta;
     }
 
-    public Venta precioVenta(Double precioVenta) {
-        this.setPrecioVenta(precioVenta);
-        return this;
-    }
-
-    public void setPrecioVenta(Double precioVenta) {
+    public void setPrecioVenta(BigDecimal precioVenta) {
         this.precioVenta = precioVenta;
     }
 
-    public Boolean getResultado() {
-        return this.resultado;
+    public ResultadoVenta getResultado() {
+        return resultado;
     }
 
-    public Venta resultado(Boolean resultado) {
-        this.setResultado(resultado);
-        return this;
-    }
-
-    public void setResultado(Boolean resultado) {
+    public void setResultado(ResultadoVenta resultado) {
         this.resultado = resultado;
     }
 
-    public String getDescripcion() {
-        return this.descripcion;
+    public String getMensaje() {
+        return mensaje;
     }
 
-    public Venta descripcion(String descripcion) {
-        this.setDescripcion(descripcion);
-        return this;
+    public void setMensaje(String mensaje) {
+        this.mensaje = mensaje;
     }
 
-    public void setDescripcion(String descripcion) {
-        this.descripcion = descripcion;
+    public Integer getIntentosReintento() {
+        return intentosReintento;
     }
 
-    public Integer getCantidadAsientos() {
-        return this.cantidadAsientos;
+    public void setIntentosReintento(Integer intentosReintento) {
+        this.intentosReintento = intentosReintento;
     }
 
-    public Venta cantidadAsientos(Integer cantidadAsientos) {
-        this.setCantidadAsientos(cantidadAsientos);
-        return this;
+    public Instant getUltimoIntentoReintento() {
+        return ultimoIntentoReintento;
     }
 
-    public void setCantidadAsientos(Integer cantidadAsientos) {
-        this.cantidadAsientos = cantidadAsientos;
+    public void setUltimoIntentoReintento(Instant ultimoIntentoReintento) {
+        this.ultimoIntentoReintento = ultimoIntentoReintento;
     }
 
-    public Set<Asiento> getAsientos() {
-        return this.asientos;
+    public Set<AsientoVenta> getAsientos() {
+        return asientos;
     }
 
-    public void setAsientos(Set<Asiento> asientos) {
-        if (this.asientos != null) {
-            this.asientos.forEach(i -> i.setVenta(null));
-        }
-        if (asientos != null) {
-            asientos.forEach(i -> i.setVenta(this));
-        }
+    public void setAsientos(Set<AsientoVenta> asientos) {
         this.asientos = asientos;
     }
 
-    public Venta asientos(Set<Asiento> asientos) {
-        this.setAsientos(asientos);
-        return this;
-    }
-
-    public Venta addAsientos(Asiento asiento) {
+    public Venta addAsiento(AsientoVenta asiento) {
         this.asientos.add(asiento);
         asiento.setVenta(this);
         return this;
     }
 
-    public Venta removeAsientos(Asiento asiento) {
+    public Venta removeAsiento(AsientoVenta asiento) {
         this.asientos.remove(asiento);
         asiento.setVenta(null);
         return this;
     }
-
-    public User getUser() {
-        return this.user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public Venta user(User user) {
-        this.setUser(user);
-        return this;
-    }
-
-    public Evento getEvento() {
-        return this.evento;
-    }
-
-    public void setEvento(Evento evento) {
-        this.evento = evento;
-    }
-
-    public Venta evento(Evento evento) {
-        this.setEvento(evento);
-        return this;
-    }
-
-    // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
 
     @Override
     public boolean equals(Object o) {
@@ -218,26 +210,23 @@ public class Venta implements Serializable {
         if (!(o instanceof Venta)) {
             return false;
         }
-        return getId() != null && getId().equals(((Venta) o).getId());
+        return id != null && id.equals(((Venta) o).id);
     }
 
     @Override
     public int hashCode() {
-        // see https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
-        return getClass().hashCode();
+        return Objects.hashCode(id);
     }
 
-    // prettier-ignore
     @Override
     public String toString() {
         return "Venta{" +
-            "id=" + getId() +
-            ", ventaIdCatedra=" + getVentaIdCatedra() +
-            ", fechaVenta='" + getFechaVenta() + "'" +
-            ", precioVenta=" + getPrecioVenta() +
-            ", resultado='" + getResultado() + "'" +
-            ", descripcion='" + getDescripcion() + "'" +
-            ", cantidadAsientos=" + getCantidadAsientos() +
-            "}";
+                "id=" + id +
+                ", ventaIdCatedra=" + ventaIdCatedra +
+                ", eventoId=" + eventoId +
+                ", fechaVenta=" + fechaVenta +
+                ", precioVenta=" + precioVenta +
+                ", resultado=" + resultado +
+                '}';
     }
 }

@@ -1,6 +1,5 @@
 package com.celi.backend.service;
 
-import com.celi.backend.domain.User;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import java.nio.charset.StandardCharsets;
@@ -15,6 +14,9 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
+
+import com.celi.backend.domain.User;
+
 import tech.jhipster.config.JHipsterProperties;
 
 /**
@@ -40,11 +42,10 @@ public class MailService {
     private final SpringTemplateEngine templateEngine;
 
     public MailService(
-        JHipsterProperties jHipsterProperties,
-        JavaMailSender javaMailSender,
-        MessageSource messageSource,
-        SpringTemplateEngine templateEngine
-    ) {
+            JHipsterProperties jHipsterProperties,
+            JavaMailSender javaMailSender,
+            MessageSource messageSource,
+            SpringTemplateEngine templateEngine) {
         this.jHipsterProperties = jHipsterProperties;
         this.javaMailSender = javaMailSender;
         this.messageSource = messageSource;
@@ -58,13 +59,12 @@ public class MailService {
 
     private void sendEmailSync(String to, String subject, String content, boolean isMultipart, boolean isHtml) {
         LOG.debug(
-            "Send email[multipart '{}' and html '{}'] to '{}' with subject '{}' and content={}",
-            isMultipart,
-            isHtml,
-            to,
-            subject,
-            content
-        );
+                "Send email[multipart '{}' and html '{}'] to '{}' with subject '{}' and content={}",
+                isMultipart,
+                isHtml,
+                to,
+                subject,
+                content);
 
         // Prepare message using a Spring helper
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();

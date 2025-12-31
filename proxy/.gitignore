@@ -1,0 +1,47 @@
+HELP.md
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### VS Code ###
+.vscode/
+
+
+### Android/Mobile Cache ###
+mobile/.gradle/
+mobile/app/build/
+mobile/shared/build/
+mobile/build/
+mobile/.idea/
+mobile/local.properties
+mobile/*.iml
+mobile/.cxx/
+mobile/.externalNativeBuild/
+mobile/app/.cxx/
+mobile/app/.externalNativeBuild/

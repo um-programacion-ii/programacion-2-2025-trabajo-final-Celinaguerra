@@ -69,7 +69,8 @@ public class Authority implements Serializable, Persistable<String> {
         return this;
     }
 
-    // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
+    // jhipster-needle-entity-add-getters-setters - JHipster will add getters and
+    // setters here
 
     @Override
     public boolean equals(Object o) {
@@ -91,7 +92,7 @@ public class Authority implements Serializable, Persistable<String> {
     @Override
     public String toString() {
         return "Authority{" +
-            "name=" + getName() +
-            "}";
+                "name=" + getName() +
+                "}";
     }
 }

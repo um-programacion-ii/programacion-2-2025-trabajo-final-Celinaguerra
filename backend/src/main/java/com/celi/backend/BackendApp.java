@@ -1,7 +1,5 @@
 package com.celi.backend;
 
-import com.celi.backend.config.ApplicationProperties;
-import com.celi.backend.config.CRLFLogConverter;
 import jakarta.annotation.PostConstruct;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -13,49 +11,79 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.h2.H2ConsoleAutoConfiguration;
 import org.springframework.boot.autoconfigure.liquibase.LiquibaseProperties;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.event.EventListener;
 import org.springframework.core.env.Environment;
+
+import com.celi.backend.config.ApplicationProperties;
+import com.celi.backend.config.CRLFLogConverter;
+import com.celi.backend.service.warmup.RedisWarmupService;
+
 import tech.jhipster.config.DefaultProfileUtil;
 import tech.jhipster.config.JHipsterConstants;
 
-@SpringBootApplication
+@SpringBootApplication(exclude = { H2ConsoleAutoConfiguration.class })
 @EnableConfigurationProperties({ LiquibaseProperties.class, ApplicationProperties.class })
 public class BackendApp {
 
     private static final Logger LOG = LoggerFactory.getLogger(BackendApp.class);
 
     private final Environment env;
+    private final RedisWarmupService redisWarmupService;
 
-    public BackendApp(Environment env) {
+    public BackendApp(Environment env, RedisWarmupService redisWarmupService) {
         this.env = env;
+        this.redisWarmupService = redisWarmupService;
     }
 
     /**
      * Initializes backend.
      * <p>
-     * Spring profiles can be configured with a program argument --spring.profiles.active=your-active-profile
+     * Spring profiles can be configured with a program argument
+     * --spring.profiles.active=your-active-profile
      * <p>
-     * You can find more information on how profiles work with JHipster on <a href="https://www.jhipster.tech/profiles/">https://www.jhipster.tech/profiles/</a>.
+     * You can find more information on how profiles work with JHipster on <a href=
+     * "https://www.jhipster.tech/profiles/">https://www.jhipster.tech/profiles/</a>.
      */
     @PostConstruct
     public void initApplication() {
         Collection<String> activeProfiles = Arrays.asList(env.getActiveProfiles());
-        if (
-            activeProfiles.contains(JHipsterConstants.SPRING_PROFILE_DEVELOPMENT) &&
-            activeProfiles.contains(JHipsterConstants.SPRING_PROFILE_PRODUCTION)
-        ) {
+        if (activeProfiles.contains(JHipsterConstants.SPRING_PROFILE_DEVELOPMENT) &&
+                activeProfiles.contains(JHipsterConstants.SPRING_PROFILE_PRODUCTION)) {
             LOG.error(
-                "You have misconfigured your application! It should not run " + "with both the 'dev' and 'prod' profiles at the same time."
-            );
+                    "You have misconfigured your application! It should not run "
+                            + "with both the 'dev' and 'prod' profiles at the same time.");
         }
-        if (
-            activeProfiles.contains(JHipsterConstants.SPRING_PROFILE_DEVELOPMENT) &&
-            activeProfiles.contains(JHipsterConstants.SPRING_PROFILE_CLOUD)
-        ) {
+        if (activeProfiles.contains(JHipsterConstants.SPRING_PROFILE_DEVELOPMENT) &&
+                activeProfiles.contains(JHipsterConstants.SPRING_PROFILE_CLOUD)) {
             LOG.error(
-                "You have misconfigured your application! It should not " + "run with both the 'dev' and 'cloud' profiles at the same time."
-            );
+                    "You have misconfigured your application! It should not "
+                            + "run with both the 'dev' and 'cloud' profiles at the same time.");
+        }
+
+    }
+
+    /**
+     * Ejecuta el warm-up de Redis después de que la aplicación esté completamente
+     * lista.
+     * Esto asegura que todos los servicios estén inicializados antes de intentar
+     * bloquear asientos.
+     */
+    @EventListener(ApplicationReadyEvent.class)
+    public void onApplicationReady() {
+        // Iniciar warm-up de Redis de forma asíncrona
+        // Esto asegura que Redis tenga datos actualizados al iniciar la aplicación
+        // El bloqueo dura solo 2.5 minutos, así que no afecta significativamente a los
+        // usuarios
+        try {
+            LOG.info("Aplicación lista, iniciando warm-up de Redis...");
+            redisWarmupService.warmupRedis();
+        } catch (Exception e) {
+            LOG.warn("No se pudo iniciar el warm-up de Redis (puede ser normal si los servicios aún no están listos)",
+                    e);
         }
     }
 
@@ -72,12 +100,13 @@ public class BackendApp {
     }
 
     private static void logApplicationStartup(Environment env) {
-        String protocol = Optional.ofNullable(env.getProperty("server.ssl.key-store")).map(key -> "https").orElse("http");
+        String protocol = Optional.ofNullable(env.getProperty("server.ssl.key-store")).map(key -> "https")
+                .orElse("http");
         String applicationName = env.getProperty("spring.application.name");
         String serverPort = env.getProperty("server.port");
         String contextPath = Optional.ofNullable(env.getProperty("server.servlet.context-path"))
-            .filter(StringUtils::isNotBlank)
-            .orElse("/");
+                .filter(StringUtils::isNotBlank)
+                .orElse("/");
         String hostAddress = "localhost";
         try {
             hostAddress = InetAddress.getLocalHost().getHostAddress();
@@ -85,24 +114,23 @@ public class BackendApp {
             LOG.warn("The host name could not be determined, using `localhost` as fallback");
         }
         LOG.info(
-            CRLFLogConverter.CRLF_SAFE_MARKER,
-            """
+                CRLFLogConverter.CRLF_SAFE_MARKER,
+                """
 
-            ----------------------------------------------------------
-            \tApplication '{}' is running! Access URLs:
-            \tLocal: \t\t{}://localhost:{}{}
-            \tExternal: \t{}://{}:{}{}
-            \tProfile(s): \t{}
-            ----------------------------------------------------------""",
-            applicationName,
-            protocol,
-            serverPort,
-            contextPath,
-            protocol,
-            hostAddress,
-            serverPort,
-            contextPath,
-            env.getActiveProfiles().length == 0 ? env.getDefaultProfiles() : env.getActiveProfiles()
-        );
+                        ----------------------------------------------------------
+                        \tApplication '{}' is running! Access URLs:
+                        \tLocal: \t\t{}://localhost:{}{}
+                        \tExternal: \t{}://{}:{}{}
+                        \tProfile(s): \t{}
+                        ----------------------------------------------------------""",
+                applicationName,
+                protocol,
+                serverPort,
+                contextPath,
+                protocol,
+                hostAddress,
+                serverPort,
+                contextPath,
+                env.getActiveProfiles().length == 0 ? env.getDefaultProfiles() : env.getActiveProfiles());
     }
 }

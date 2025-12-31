@@ -1,8 +1,5 @@
 package com.celi.backend.security;
 
-import com.celi.backend.domain.Authority;
-import com.celi.backend.domain.User;
-import com.celi.backend.repository.UserRepository;
 import java.util.*;
 import org.hibernate.validator.internal.constraintvalidators.hv.EmailValidator;
 import org.slf4j.Logger;
@@ -14,6 +11,10 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.celi.backend.domain.Authority;
+import com.celi.backend.domain.User;
+import com.celi.backend.repository.UserRepository;
 
 /**
  * Authenticate a user from the database.
@@ -36,19 +37,22 @@ public class DomainUserDetailsService implements UserDetailsService {
 
         if (new EmailValidator().isValid(login, null)) {
             return userRepository
-                .findOneWithAuthoritiesByEmailIgnoreCase(login)
-                .map(user -> createSpringSecurityUser(login, user))
-                .orElseThrow(() -> new UsernameNotFoundException("User with email " + login + " was not found in the database"));
+                    .findOneWithAuthoritiesByEmailIgnoreCase(login)
+                    .map(user -> createSpringSecurityUser(login, user))
+                    .orElseThrow(() -> new UsernameNotFoundException(
+                            "User with email " + login + " was not found in the database"));
         }
 
         String lowercaseLogin = login.toLowerCase(Locale.ENGLISH);
         return userRepository
-            .findOneWithAuthoritiesByLogin(lowercaseLogin)
-            .map(user -> createSpringSecurityUser(lowercaseLogin, user))
-            .orElseThrow(() -> new UsernameNotFoundException("User " + lowercaseLogin + " was not found in the database"));
+                .findOneWithAuthoritiesByLogin(lowercaseLogin)
+                .map(user -> createSpringSecurityUser(lowercaseLogin, user))
+                .orElseThrow(() -> new UsernameNotFoundException(
+                        "User " + lowercaseLogin + " was not found in the database"));
     }
 
-    private org.springframework.security.core.userdetails.User createSpringSecurityUser(String lowercaseLogin, User user) {
+    private org.springframework.security.core.userdetails.User createSpringSecurityUser(String lowercaseLogin,
+            User user) {
         if (!user.isActivated()) {
             throw new UserNotActivatedException("User " + lowercaseLogin + " was not activated");
         }
@@ -80,11 +84,10 @@ public class DomainUserDetailsService implements UserDetailsService {
 
         public static UserWithId fromUser(User user) {
             return new UserWithId(
-                user.getLogin(),
-                user.getPassword(),
-                user.getAuthorities().stream().map(Authority::getName).map(SimpleGrantedAuthority::new).toList(),
-                user.getId()
-            );
+                    user.getLogin(),
+                    user.getPassword(),
+                    user.getAuthorities().stream().map(Authority::getName).map(SimpleGrantedAuthority::new).toList(),
+                    user.getId());
         }
     }
 }

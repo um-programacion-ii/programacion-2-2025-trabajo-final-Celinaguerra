@@ -16,6 +16,25 @@
 spring:
   application:
     name: backend
+  cloud:
+    function:
+      definition: kafkaConsumer;kafkaProducer
+    stream:
+      kafka:
+        binder:
+          replicationFactor: 1
+          auto-create-topics: true
+      bindings:
+        binding-out-0:
+          content-type: text/plain
+          group: backend
+        kafkaConsumer-in-0:
+          destination: sse-topic
+          content-type: text/plain
+          group: backend
+        kafkaProducer-out-0:
+          content-type: text/plain
+          group: backend
   # Replace by 'prod, faker' to add the faker context and have sample data loaded in production
   liquibase:
     contexts: test
@@ -75,7 +94,7 @@ jhipster:
     authentication:
       jwt:
         # This token must be encoded using Base64 (you can type `echo 'secret-key'|base64` on your command line)
-        base64-secret: MjY1NjNlNmM2MDkwMGMxODgxOWYxYjk5NzUwNzhiNGY5ZjY1OTk1NzBiNjdlOGU1MjFkYWVlMTlmMmRhZGI1ZTYwZWM3ZjQ4YjhmZWI1YzNiYzM5ZWExZmI0ODEzOTZmZjc0ZDYwN2M0ODVkYTVhNWM1ZGJhYzE3YTMxZGQ2YTM=
+        base64-secret: YTEzNjM3NmQzNjg5ZjkyNmZkMDQyMTI2OGIxNzkwNjcyMTEzZjcwZjcwZTVkYzdjMzkyMjFhYmQyNWE1NTAwZWFkNTU3Yzk4YTljNGRjY2RiMzY0ODZhMDY3YmE0OGEyM2YzMzNmYTNjY2NkMmY0ZDNmOTU3NzI1OTBjYjVmYjM=
         # Token is valid 24 hours
         token-validity-in-seconds: 86400
         token-validity-in-seconds-for-remember-me: 86400

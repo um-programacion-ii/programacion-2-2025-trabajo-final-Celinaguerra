@@ -2,131 +2,145 @@ package com.celi.backend.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 /**
- * A Evento.
+ * Entidad Evento que representa un evento único (charla, curso, obra de teatro,
+ * etc.)
  */
 @Entity
 @Table(name = "evento")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-@SuppressWarnings("common-java:DuplicatedBlocks")
-public class Evento implements Serializable {
+public class Evento extends AbstractAuditingEntity<Long> implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "evento_seq")
+    @SequenceGenerator(name = "evento_seq", sequenceName = "evento_seq", allocationSize = 1)
     private Long id;
 
+    /**
+     * ID del evento en el servicio de la cátedra (para sincronización)
+     */
     @NotNull
-    @Column(name = "titulo", nullable = false)
+    @Column(name = "evento_id_catedra", nullable = false, unique = true)
+    private Long eventoIdCatedra;
+
+    @NotNull
+    @Size(max = 200)
+    @Column(name = "titulo", length = 200, nullable = false)
     private String titulo;
 
-    @Column(name = "resumen")
-    private String resumen;
-
-    @Lob
-    @Column(name = "descripcion")
+    @Size(max = 2000)
+    @Column(name = "descripcion", length = 2000)
     private String descripcion;
+
+    @Size(max = 500)
+    @Column(name = "resumen", length = 500)
+    private String resumen;
 
     @NotNull
     @Column(name = "fecha", nullable = false)
     private Instant fecha;
 
-    @Column(name = "direccion")
+    @Size(max = 200)
+    @Column(name = "direccion", length = 200)
     private String direccion;
 
-    @Column(name = "imagen", length = 2048)
-    private String imagen;
+    @Size(max = 500)
+    @Column(name = "imagen_url", length = 500)
+    private String imagenUrl;
 
-    @Column(name = "fila_asientos")
-    private Integer filaAsientos;
+    @Column(name = "precio", precision = 21, scale = 2)
+    private BigDecimal precio;
 
-    @Column(name = "column_asientos")
-    private Integer columnAsientos;
-
+    /**
+     * Indica si el evento está cancelado
+     */
     @NotNull
-    @Column(name = "precio_entrada", nullable = false)
-    private Double precioEntrada;
+    @Column(name = "cancelado", nullable = false)
+    private Boolean cancelado = false;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "rel_evento__integrante", joinColumns = @JoinColumn(name = "evento_id"), inverseJoinColumns = @JoinColumn(name = "integrante_id"))
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    /**
+     * Relación con el tipo de evento
+     */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "tipo_id")
     @JsonIgnoreProperties(value = { "eventos" }, allowSetters = true)
+    private EventoTipo tipo;
+
+    /**
+     * Integrantes o participantes del evento
+     */
+    @OneToMany(mappedBy = "evento", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @JsonIgnoreProperties(value = { "evento" }, allowSetters = true)
     private Set<Integrante> integrantes = new HashSet<>();
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    private TipoEvento eventoTipo;
+    /**
+     * Número de filas de asientos del evento
+     */
+    @Column(name = "fila_asientos")
+    private Integer filaAsiento;
 
-    // jhipster-needle-entity-add-field - JHipster will add fields here
+    /**
+     * Número de columnas de asientos del evento
+     */
+    @Column(name = "column_asientos")
+    private Integer columnAsiento;
 
     public Long getId() {
-        return this.id;
-    }
-
-    public Evento id(Long id) {
-        this.setId(id);
-        return this;
+        return id;
     }
 
     public void setId(Long id) {
         this.id = id;
     }
 
-    public String getTitulo() {
-        return this.titulo;
+    public Long getEventoIdCatedra() {
+        return eventoIdCatedra;
     }
 
-    public Evento titulo(String titulo) {
-        this.setTitulo(titulo);
-        return this;
+    public void setEventoIdCatedra(Long eventoIdCatedra) {
+        this.eventoIdCatedra = eventoIdCatedra;
+    }
+
+    public String getTitulo() {
+        return titulo;
     }
 
     public void setTitulo(String titulo) {
         this.titulo = titulo;
     }
 
-    public String getResumen() {
-        return this.resumen;
-    }
-
-    public Evento resumen(String resumen) {
-        this.setResumen(resumen);
-        return this;
-    }
-
-    public void setResumen(String resumen) {
-        this.resumen = resumen;
-    }
-
     public String getDescripcion() {
-        return this.descripcion;
-    }
-
-    public Evento descripcion(String descripcion) {
-        this.setDescripcion(descripcion);
-        return this;
+        return descripcion;
     }
 
     public void setDescripcion(String descripcion) {
         this.descripcion = descripcion;
     }
 
-    public Instant getFecha() {
-        return this.fecha;
+    public String getResumen() {
+        return resumen;
     }
 
-    public Evento fecha(Instant fecha) {
-        this.setFecha(fecha);
-        return this;
+    public void setResumen(String resumen) {
+        this.resumen = resumen;
+    }
+
+    public Instant getFecha() {
+        return fecha;
     }
 
     public void setFecha(Instant fecha) {
@@ -134,108 +148,87 @@ public class Evento implements Serializable {
     }
 
     public String getDireccion() {
-        return this.direccion;
-    }
-
-    public Evento direccion(String direccion) {
-        this.setDireccion(direccion);
-        return this;
+        return direccion;
     }
 
     public void setDireccion(String direccion) {
         this.direccion = direccion;
     }
 
-    public String getImagen() {
-        return this.imagen;
+    public String getImagenUrl() {
+        return imagenUrl;
     }
 
-    public Evento imagen(String imagen) {
-        this.setImagen(imagen);
-        return this;
+    public void setImagenUrl(String imagenUrl) {
+        this.imagenUrl = imagenUrl;
     }
 
-    public void setImagen(String imagen) {
-        this.imagen = imagen;
+    public BigDecimal getPrecio() {
+        return precio;
     }
 
-    public Integer getFilaAsientos() {
-        return this.filaAsientos;
+    public void setPrecio(BigDecimal precio) {
+        this.precio = precio;
     }
 
-    public Evento filaAsientos(Integer filaAsientos) {
-        this.setFilaAsientos(filaAsientos);
-        return this;
+    public Boolean getCancelado() {
+        return cancelado;
     }
 
-    public void setFilaAsientos(Integer filaAsientos) {
-        this.filaAsientos = filaAsientos;
+    public void setCancelado(Boolean cancelado) {
+        this.cancelado = cancelado;
     }
 
-    public Integer getColumnAsientos() {
-        return this.columnAsientos;
+    public EventoTipo getTipo() {
+        return tipo;
     }
 
-    public Evento columnAsientos(Integer columnAsientos) {
-        this.setColumnAsientos(columnAsientos);
-        return this;
-    }
-
-    public void setColumnAsientos(Integer columnAsientos) {
-        this.columnAsientos = columnAsientos;
-    }
-
-    public Double getPrecioEntrada() {
-        return this.precioEntrada;
-    }
-
-    public Evento precioEntrada(Double precioEntrada) {
-        this.setPrecioEntrada(precioEntrada);
-        return this;
-    }
-
-    public void setPrecioEntrada(Double precioEntrada) {
-        this.precioEntrada = precioEntrada;
+    public void setTipo(EventoTipo tipo) {
+        this.tipo = tipo;
     }
 
     public Set<Integrante> getIntegrantes() {
-        return this.integrantes;
+        return integrantes;
     }
 
     public void setIntegrantes(Set<Integrante> integrantes) {
         this.integrantes = integrantes;
     }
 
-    public Evento integrantes(Set<Integrante> integrantes) {
-        this.setIntegrantes(integrantes);
-        return this;
-    }
-
-    public Evento addIntegrantes(Integrante integrante) {
+    public Evento addIntegrante(Integrante integrante) {
         this.integrantes.add(integrante);
+        integrante.setEvento(this);
         return this;
     }
 
-    public Evento removeIntegrantes(Integrante integrante) {
+    public Evento removeIntegrante(Integrante integrante) {
         this.integrantes.remove(integrante);
+        integrante.setEvento(null);
         return this;
     }
 
-    public TipoEvento getEventoTipo() {
-        return this.eventoTipo;
+    public Integer getFilaAsiento() {
+        return filaAsiento;
     }
 
-    public void setEventoTipo(TipoEvento tipoEvento) {
-        this.eventoTipo = tipoEvento;
+    public void setFilaAsiento(Integer filaAsiento) {
+        this.filaAsiento = filaAsiento;
     }
 
-    public Evento eventoTipo(TipoEvento tipoEvento) {
-        this.setEventoTipo(tipoEvento);
-        return this;
+    public Integer getColumnAsiento() {
+        return columnAsiento;
     }
 
-    // jhipster-needle-entity-add-getters-setters - JHipster will add getters and
-    // setters here
+    public void setColumnAsiento(Integer columnAsiento) {
+        this.columnAsiento = columnAsiento;
+    }
+
+    /**
+     * Verifica si el evento está expirado (fecha pasada)
+     */
+    public boolean isExpirado() {
+        return fecha != null && fecha.isBefore(Instant.now());
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -245,30 +238,22 @@ public class Evento implements Serializable {
         if (!(o instanceof Evento)) {
             return false;
         }
-        return getId() != null && getId().equals(((Evento) o).getId());
+        return id != null && id.equals(((Evento) o).id);
     }
 
     @Override
     public int hashCode() {
-        // see
-        // https://vladmihalcea.com/how-to-implement-equals-and-hashcode-using-the-jpa-entity-identifier/
-        return getClass().hashCode();
+        return Objects.hashCode(id);
     }
 
-    // prettier-ignore
     @Override
     public String toString() {
         return "Evento{" +
-                "id=" + getId() +
-                ", titulo='" + getTitulo() + "'" +
-                ", resumen='" + getResumen() + "'" +
-                ", descripcion='" + getDescripcion() + "'" +
-                ", fecha='" + getFecha() + "'" +
-                ", direccion='" + getDireccion() + "'" +
-                ", imagen='" + getImagen() + "'" +
-                ", filaAsientos=" + getFilaAsientos() +
-                ", columnAsientos=" + getColumnAsientos() +
-                ", precioEntrada=" + getPrecioEntrada() +
-                "}";
+                "id=" + id +
+                ", eventoIdCatedra=" + eventoIdCatedra +
+                ", titulo='" + titulo + '\'' +
+                ", fecha=" + fecha +
+                ", cancelado=" + cancelado +
+                '}';
     }
 }

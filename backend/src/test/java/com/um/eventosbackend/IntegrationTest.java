@@ -1,0 +1,26 @@
+package com.celi.backend;
+
+import com.celi.backend.BackendApp;
+import com.celi.backend.config.JacksonConfiguration;
+import com.celi.backend.config.AsyncSyncConfiguration;
+import com.celi.backend.config.EmbeddedElasticsearch;
+import com.celi.backend.config.EmbeddedKafka;
+import com.celi.backend.config.EmbeddedSQL;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+import org.springframework.boot.test.context.SpringBootTest;
+
+/**
+ * Base composite annotation for integration tests.
+ */
+@Target(ElementType.TYPE)
+@Retention(RetentionPolicy.RUNTIME)
+@SpringBootTest(classes = { BackendApp.class, JacksonConfiguration.class, AsyncSyncConfiguration.class })
+@EmbeddedElasticsearch
+@EmbeddedSQL
+@EmbeddedKafka
+public @interface IntegrationTest {
+}
