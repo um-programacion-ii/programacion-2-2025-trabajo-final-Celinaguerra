@@ -8,11 +8,13 @@ import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.Event
+import androidx.compose.material.icons.filled.ShoppingBag
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -30,6 +32,7 @@ fun EventListScreen(
     api: MobileApi,
     onEventClick: (Long) -> Unit,
     onLogout: () -> Unit,
+    onViewPurchases: () -> Unit,
     viewModel: EventListViewModel = viewModel(factory = EventListViewModelFactory(api))
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -39,7 +42,14 @@ fun EventListScreen(
             TopAppBar(
                 title = { Text("Eventos Disponibles") },
                 actions = {
-                    IconButton(onClick = onLogout) {
+                    IconButton(onClick = onViewPurchases) {
+                        Icon(
+                            imageVector = Icons.Default.ShoppingBag, 
+                            contentDescription = "Mis Compras",
+                            tint = Color.Black
+                        )
+                    }
+                    TextButton(onClick = onLogout) {
                         Text("Salir")
                     }
                 }

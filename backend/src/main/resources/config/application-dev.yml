@@ -121,7 +121,7 @@ application:
     # Servicio de la cátedra en red ZeroTier (192.168.194.0/24)
     base-url: http://192.168.194.250:8080
     registration-endpoint: /api/v1/agregar_usuario
-    auth-token: ${CATEDRA_AUTH_TOKEN:eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJjZWxpIiwiZXhwIjoxNzY5ODIwNDg1LCJhdXRoIjoiUk9MRV9VU0VSIiwiaWF0IjoxNzY3MjI4NDg1fQ.j0hOXJVr-j89irsp2yuaj_eaROzQUFHbBwR3WTDIlFxXHBlWDLVo81uARgguYV5RLoO0tzYEqBscZwafZAmk2Q}
+    auth-token: ${CATEDRA_AUTH_TOKEN:eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJjZWxpIiwiZXhwIjoxNzY5ODg0ODAyLCJhdXRoIjoiUk9MRV9VU0VSIiwiaWF0IjoxNzY3MjkyODAyfQ.tznP6XFoKxbWGyo9MJknp6jjFXEh501J0Gw5Btw9925957gARI5ct0aPtyCV8sL33EeKR9LdGiXR-sBvsk0ASA}
     connect-timeout-ms: 5000
     read-timeout-ms: 10000
   # Servicios externos de la cátedra en ZeroTier

@@ -1,0 +1,12 @@
+-- Merging decision tree log ---
+manifest
+ADDED from /home/celi/programacion2/programacion-2-2025-trabajo-final-Celinaguerra/mobile/shared/src/androidMain/AndroidManifest.xml:1:1-46
+INJECTED from /home/celi/programacion2/programacion-2-2025-trabajo-final-Celinaguerra/mobile/shared/src/androidMain/AndroidManifest.xml:1:1-46
+	package
+		ADDED from /home/celi/programacion2/programacion-2-2025-trabajo-final-Celinaguerra/mobile/shared/src/androidMain/AndroidManifest.xml:1:11-43
+		INJECTED from /home/celi/programacion2/programacion-2-2025-trabajo-final-Celinaguerra/mobile/shared/src/androidMain/AndroidManifest.xml
+uses-sdk
+INJECTED from /home/celi/programacion2/programacion-2-2025-trabajo-final-Celinaguerra/mobile/shared/src/androidMain/AndroidManifest.xml reason: use-sdk injection requested
+INJECTED from /home/celi/programacion2/programacion-2-2025-trabajo-final-Celinaguerra/mobile/shared/src/androidMain/AndroidManifest.xml
+	android:minSdkVersion
+		INJECTED from /home/celi/programacion2/programacion-2-2025-trabajo-final-Celinaguerra/mobile/shared/src/androidMain/AndroidManifest.xml

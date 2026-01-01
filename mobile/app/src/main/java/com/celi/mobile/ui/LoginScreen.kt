@@ -11,6 +11,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.celi.mobile.shared.AuthApi
 import com.celi.mobile.model.LoginEffect
+import com.celi.mobile.ui.theme.Purple40
 import com.celi.mobile.viewmodel.LoginViewModel
 import com.celi.mobile.viewmodel.LoginViewModelFactory
 import kotlinx.coroutines.flow.collectLatest
@@ -51,9 +52,16 @@ fun LoginScreen(
             verticalArrangement = Arrangement.Center
         ) {
             Text(
-                text = "Eventos Mobile",
-                style = MaterialTheme.typography.displaySmall,
-                color = MaterialTheme.colorScheme.primary,
+                text = "Eventos",
+                style = MaterialTheme.typography.displayMedium,
+                color = Purple40, // Use Purple40 (Primary in Light, but defined as a constant)
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+            
+            Text(
+                text = "Tu entrada al entretenimiento",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.secondary,
                 modifier = Modifier.padding(bottom = 48.dp)
             )
 

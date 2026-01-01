@@ -17,29 +17,29 @@ import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Blue80,
-    secondary = Teal80,
-    tertiary = Green80,
-    background = SurfaceDark,
-    surface = Color(0xFF1E1E1E),
-    surfaceVariant = Color(0xFF2C2C2C)
+    primary = Purple80,
+    secondary = PurpleSecondary80,
+    tertiary = Pink80,
+    background = LilacBackgroundDark,
+    surface = Color(0xFF252329), // Slightly different from background for depth
+    surfaceVariant = Color(0xFF322F37)
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Blue40,
-    secondary = Teal40,
-    tertiary = Green40,
-    background = Color(0xFFFAFAFA),
+    primary = Purple40,
+    secondary = PurpleSecondary40,
+    tertiary = Pink40,
+    background = LilacBackgroundLight,
     surface = Color.White,
     surfaceVariant = SurfaceLight,
-    primaryContainer = Color(0xFFE3F2FD),
-    secondaryContainer = Color(0xFFE0F2F1)
+    primaryContainer = Color(0xFFC4A8CC), // Light violet container
+    secondaryContainer = Color(0xFFAC96CC)
 )
 
 @Composable
 fun EventosMobileTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    dynamicColor: Boolean = true,
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {

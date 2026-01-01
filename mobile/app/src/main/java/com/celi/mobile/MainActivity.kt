@@ -111,7 +111,16 @@ class MainActivity : ComponentActivity() {
                                             tokenStorage.clearToken()
                                             token = null
                                         }
+                                    },
+                                    onViewPurchases = {
+                                        currentScreen = Screen.PurchaseList
                                     }
+                                )
+                            }
+                            is Screen.PurchaseList -> {
+                                PurchaseListScreen(
+                                    api = mobileApi,
+                                    onBack = { currentScreen = Screen.EventList }
                                 )
                             }
                             is Screen.EventDetail -> {
@@ -227,4 +236,5 @@ sealed class Screen {
         val success: Boolean,
         val message: String
     ) : Screen()
+    object PurchaseList : Screen()
 }

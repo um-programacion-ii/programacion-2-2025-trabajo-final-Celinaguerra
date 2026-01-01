@@ -11,6 +11,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.celi.mobile.shared.AuthApi
 import com.celi.mobile.model.RegisterEffect
+import com.celi.mobile.ui.theme.Purple40
 import com.celi.mobile.viewmodel.RegisterViewModel
 import com.celi.mobile.viewmodel.RegisterViewModelFactory
 import kotlinx.coroutines.flow.collectLatest
@@ -64,9 +65,16 @@ fun RegisterScreen(
             verticalArrangement = Arrangement.Center
         ) {
             Text(
-                text = "Eventos Mobile",
-                style = MaterialTheme.typography.displaySmall,
-                color = MaterialTheme.colorScheme.primary,
+                text = "Crea tu cuenta",
+                style = MaterialTheme.typography.displayMedium,
+                color = Purple40,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+            
+            Text(
+                text = "Y no te pierdas ningún evento",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.secondary,
                 modifier = Modifier.padding(bottom = 32.dp)
             )
 

@@ -37,3 +37,13 @@ data class SeatSaleResponseDto(
     val apellidoPersona: String? = null
 )
 
+@Serializable
+data class VentaResumenDto(
+    val id: Long,
+    val eventoId: Long,
+    val fechaVenta: String, // ISO 8601
+    val precioVenta: Double,
+    val resultado: String, // "EXITOSA", "FALLIDA"
+    val cantidadAsientos: Int
+)
+

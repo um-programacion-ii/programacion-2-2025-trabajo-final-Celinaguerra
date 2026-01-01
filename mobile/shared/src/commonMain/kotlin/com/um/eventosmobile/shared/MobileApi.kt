@@ -247,4 +247,13 @@ class MobileApi(
             addAuthToken()
         }
     }
+
+    /**
+     * GET /api/ventas - Obtiene el listado de ventas del usuario (BACKEND)
+     */
+    suspend fun getPurchases(): List<VentaResumenDto> {
+        return client.get("$backendUrl/api/ventas") {
+            addAuthToken()
+        }.body()
+    }
 }
