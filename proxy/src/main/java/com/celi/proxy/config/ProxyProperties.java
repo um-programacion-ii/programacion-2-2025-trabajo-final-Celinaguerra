@@ -1,4 +1,4 @@
-package com.um.eventosproxy.config;
+package com.celi.proxy.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 

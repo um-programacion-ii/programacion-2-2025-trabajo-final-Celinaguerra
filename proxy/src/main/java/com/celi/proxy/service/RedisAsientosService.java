@@ -1,9 +1,9 @@
-package com.um.eventosproxy.service;
+package com.celi.proxy.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.um.eventosproxy.dto.AsientoDTO;
-import com.um.eventosproxy.dto.MapaAsientosDTO;
+import com.celi.proxy.dto.AsientoDTO;
+import com.celi.proxy.dto.MapaAsientosDTO;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

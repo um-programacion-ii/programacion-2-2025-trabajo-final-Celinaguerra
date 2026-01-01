@@ -1,8 +1,8 @@
-package com.um.eventosproxy.service;
+package com.celi.proxy.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.um.eventosproxy.config.ProxyProperties;
+import com.celi.proxy.config.ProxyProperties;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

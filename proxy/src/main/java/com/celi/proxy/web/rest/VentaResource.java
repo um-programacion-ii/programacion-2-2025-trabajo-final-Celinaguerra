@@ -1,7 +1,7 @@
-package com.um.eventosproxy.web.rest;
+package com.celi.proxy.web.rest;
 
-import com.um.eventosproxy.dto.BloqueoAsientosRequestDTO;
-import com.um.eventosproxy.service.CatedraVentaService;
+import com.celi.proxy.dto.BloqueoAsientosRequestDTO;
+import com.celi.proxy.service.CatedraVentaService;
 import jakarta.validation.Valid;
 import java.util.ArrayList;
 import java.util.HashMap;

@@ -1,6 +1,6 @@
-package com.um.eventosproxy.service;
+package com.celi.proxy.service;
 
-import com.um.eventosproxy.config.ProxyProperties;
+import com.celi.proxy.config.ProxyProperties;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import java.nio.charset.StandardCharsets;

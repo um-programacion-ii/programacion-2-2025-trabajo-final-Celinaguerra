@@ -1,10 +1,10 @@
-package com.um.eventosproxy.web.rest;
+package com.celi.proxy.web.rest;
 
-import com.um.eventosproxy.dto.BloqueoAsientosRequestDTO;
-import com.um.eventosproxy.dto.BloqueoAsientosResponseDTO;
-import com.um.eventosproxy.dto.MapaAsientosDTO;
-import com.um.eventosproxy.service.CatedraAsientosService;
-import com.um.eventosproxy.service.RedisAsientosService;
+import com.celi.proxy.dto.BloqueoAsientosRequestDTO;
+import com.celi.proxy.dto.BloqueoAsientosResponseDTO;
+import com.celi.proxy.dto.MapaAsientosDTO;
+import com.celi.proxy.service.CatedraAsientosService;
+import com.celi.proxy.service.RedisAsientosService;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,13 +39,13 @@ public class AsientosResource {
             mapa.getAsientos() != null ? mapa.getAsientos().size() : 0, eventoId);
         if (mapa.getAsientos() != null && !mapa.getAsientos().isEmpty()) {
             long bloqueados = mapa.getAsientos().stream()
-                .filter(a -> a.getEstado() == com.um.eventosproxy.dto.AsientoDTO.EstadoAsiento.BLOQUEADO)
+                .filter(a -> a.getEstado() == com.celi.proxy.dto.AsientoDTO.EstadoAsiento.BLOQUEADO)
                 .count();
             long ocupados = mapa.getAsientos().stream()
-                .filter(a -> a.getEstado() == com.um.eventosproxy.dto.AsientoDTO.EstadoAsiento.OCUPADO)
+                .filter(a -> a.getEstado() == com.celi.proxy.dto.AsientoDTO.EstadoAsiento.OCUPADO)
                 .count();
             long libres = mapa.getAsientos().stream()
-                .filter(a -> a.getEstado() == com.um.eventosproxy.dto.AsientoDTO.EstadoAsiento.LIBRE)
+                .filter(a -> a.getEstado() == com.celi.proxy.dto.AsientoDTO.EstadoAsiento.LIBRE)
                 .count();
             LOG.info("Estados de asientos: {} bloqueados, {} ocupados, {} libres", bloqueados, ocupados, libres);
         }

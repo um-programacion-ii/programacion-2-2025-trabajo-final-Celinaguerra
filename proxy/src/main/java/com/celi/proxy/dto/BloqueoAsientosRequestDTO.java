@@ -1,4 +1,4 @@
-package com.um.eventosproxy.dto;
+package com.celi.proxy.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.io.Serializable;

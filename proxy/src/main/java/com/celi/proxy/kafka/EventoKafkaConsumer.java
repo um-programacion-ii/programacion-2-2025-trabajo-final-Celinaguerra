@@ -1,6 +1,6 @@
-package com.um.eventosproxy.kafka;
+package com.celi.proxy.kafka;
 
-import com.um.eventosproxy.service.BackendSyncService;
+import com.celi.proxy.service.BackendSyncService;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

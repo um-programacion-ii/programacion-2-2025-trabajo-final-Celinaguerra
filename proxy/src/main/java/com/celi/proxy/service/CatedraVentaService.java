@@ -1,8 +1,8 @@
-package com.um.eventosproxy.service;
+package com.celi.proxy.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.um.eventosproxy.config.ProxyProperties;
-import com.um.eventosproxy.dto.BloqueoAsientosRequestDTO;
+import com.celi.proxy.config.ProxyProperties;
+import com.celi.proxy.dto.BloqueoAsientosRequestDTO;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

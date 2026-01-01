@@ -1,11 +1,11 @@
-package com.um.eventosproxy.service;
+package com.celi.proxy.service;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.um.eventosproxy.config.ProxyProperties;
-import com.um.eventosproxy.dto.BloqueoAsientosRequestDTO;
-import com.um.eventosproxy.dto.BloqueoAsientosResponseDTO;
-import com.um.eventosproxy.dto.MapaAsientosDTO;
+import com.celi.proxy.config.ProxyProperties;
+import com.celi.proxy.dto.BloqueoAsientosRequestDTO;
+import com.celi.proxy.dto.BloqueoAsientosResponseDTO;
+import com.celi.proxy.dto.MapaAsientosDTO;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -334,11 +334,11 @@ public class CatedraAsientosService {
         LOG.info("Redis actualizado para evento {}: {} asientos", eventoId, listaAsientos.size());
     }
 
-    private List<com.um.eventosproxy.dto.AsientoDTO> convertirAsientosCatedra(List<Map<String, Object>> asientosCatedra) {
-        List<com.um.eventosproxy.dto.AsientoDTO> asientos = new ArrayList<>();
+    private List<com.celi.proxy.dto.AsientoDTO> convertirAsientosCatedra(List<Map<String, Object>> asientosCatedra) {
+        List<com.celi.proxy.dto.AsientoDTO> asientos = new ArrayList<>();
         
         for (Map<String, Object> asientoData : asientosCatedra) {
-            com.um.eventosproxy.dto.AsientoDTO asiento = new com.um.eventosproxy.dto.AsientoDTO();
+            com.celi.proxy.dto.AsientoDTO asiento = new com.celi.proxy.dto.AsientoDTO();
             
             // Convertir fila: la cátedra devuelve número, necesitamos string
             Object filaObj = asientoData.get("fila");
@@ -367,13 +367,13 @@ public class CatedraAsientosService {
             if (estadoStr != null && !estadoStr.isEmpty()) {
                 try {
                     String estadoNormalizado = estadoStr.toUpperCase().trim();
-                    asiento.setEstado(com.um.eventosproxy.dto.AsientoDTO.EstadoAsiento.valueOf(estadoNormalizado));
+                    asiento.setEstado(com.celi.proxy.dto.AsientoDTO.EstadoAsiento.valueOf(estadoNormalizado));
                 } catch (IllegalArgumentException e) {
                     LOG.warn("Estado '{}' no reconocido, usando LIBRE por defecto", estadoStr);
-                    asiento.setEstado(com.um.eventosproxy.dto.AsientoDTO.EstadoAsiento.LIBRE);
+                    asiento.setEstado(com.celi.proxy.dto.AsientoDTO.EstadoAsiento.LIBRE);
                 }
             } else {
-                asiento.setEstado(com.um.eventosproxy.dto.AsientoDTO.EstadoAsiento.LIBRE);
+                asiento.setEstado(com.celi.proxy.dto.AsientoDTO.EstadoAsiento.LIBRE);
             }
             
             asientos.add(asiento);
