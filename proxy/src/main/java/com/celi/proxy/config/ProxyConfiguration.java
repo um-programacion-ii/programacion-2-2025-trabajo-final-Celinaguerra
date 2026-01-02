@@ -1,8 +1,8 @@
-package com.um.eventosproxy.config;
+package com.celi.proxy.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.um.eventosproxy.service.catedra.CatedraTokenInterceptor;
+import com.celi.proxy.service.catedra.CatedraTokenInterceptor;
 import java.time.Duration;
 import java.util.List;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;

@@ -1,0 +1,14 @@
+[
+    {
+        "merged": "com.celi.mobile.app-debug-52:/xml_network_security_config.xml.flat",
+        "source": "com.celi.mobile.app-main-54:/xml/network_security_config.xml"
+    },
+    {
+        "merged": "com.celi.mobile.app-debug-52:/xml_backup_rules.xml.flat",
+        "source": "com.celi.mobile.app-main-54:/xml/backup_rules.xml"
+    },
+    {
+        "merged": "com.celi.mobile.app-debug-52:/xml_data_extraction_rules.xml.flat",
+        "source": "com.celi.mobile.app-main-54:/xml/data_extraction_rules.xml"
+    }
+]

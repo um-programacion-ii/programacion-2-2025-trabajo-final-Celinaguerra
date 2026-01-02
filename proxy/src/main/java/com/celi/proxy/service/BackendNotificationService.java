@@ -1,7 +1,7 @@
-package com.um.eventosproxy.service;
+package com.celi.proxy.service;
 
-import com.um.eventosproxy.config.ProxyProperties;
-import com.um.eventosproxy.dto.NotificacionEventoDTO;
+import com.celi.proxy.config.ProxyProperties;
+import com.celi.proxy.dto.NotificacionEventoDTO;
 import java.util.concurrent.CompletableFuture;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

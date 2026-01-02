@@ -1,6 +1,6 @@
-package com.um.eventosproxy.service.catedra;
+package com.celi.proxy.service.catedra;
 
-import com.um.eventosproxy.config.ProxyProperties;
+import com.celi.proxy.config.ProxyProperties;
 import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

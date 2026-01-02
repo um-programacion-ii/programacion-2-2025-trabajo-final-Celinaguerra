@@ -1,4 +1,4 @@
-package com.um.eventosproxy.dto;
+package com.celi.proxy.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;

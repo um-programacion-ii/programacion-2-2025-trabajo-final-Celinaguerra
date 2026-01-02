@@ -23,12 +23,12 @@ logging:
     org.hibernate: WARN
     org.apache.kafka: WARN
     org.springframework.kafka: WARN
-    org.springframework.web: INFO  
+    org.springframework.web: INFO
     org.springframework.security: WARN
     org.springframework.messaging: WARN
     org.springframework.web.socket: WARN
     org.springframework.messaging.simp: WARN
-    com.celi.backend.web: DEBUG 
+    com.celi.backend.web: DEBUG
 
 spring:
   devtools:
@@ -76,7 +76,7 @@ server:
 # ===================================================================
 
 jhipster:
- 
+
   # CORS is only enabled by default with the "dev" profile
   cors:
     # Allow Ionic for JHipster by default (* no longer allowed in Spring Boot 2.4+)
@@ -121,7 +121,7 @@ application:
     # Servicio de la cátedra en red ZeroTier (192.168.194.0/24)
     base-url: http://192.168.194.250:8080
     registration-endpoint: /api/v1/agregar_usuario
-    auth-token: ${CATEDRA_AUTH_TOKEN:eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJjZWxpIiwiZXhwIjoxODUzMTE3MTkyLCJhdXRoIjoiUk9MRV9VU0VSIiwiaWF0IjoxNzY2NzE3MTkyfQ.g5KbKaJcIDVPTl8kdXHcnA8a9Fvd4hK_fh9nZmvbwTGAV34zeJO0-xQFPKD09MAAK2GR9rG2zt93qdypBPccPg}
+    auth-token: ${CATEDRA_AUTH_TOKEN:eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJjZWxpIiwiZXhwIjoxNzY5ODg0ODAyLCJhdXRoIjoiUk9MRV9VU0VSIiwiaWF0IjoxNzY3MjkyODAyfQ.tznP6XFoKxbWGyo9MJknp6jjFXEh501J0Gw5Btw9925957gARI5ct0aPtyCV8sL33EeKR9LdGiXR-sBvsk0ASA}
     connect-timeout-ms: 5000
     read-timeout-ms: 10000
   # Servicios externos de la cátedra en ZeroTier

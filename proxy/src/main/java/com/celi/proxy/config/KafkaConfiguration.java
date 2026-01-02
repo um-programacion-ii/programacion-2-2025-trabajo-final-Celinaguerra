@@ -1,4 +1,4 @@
-package com.um.eventosproxy.config;
+package com.celi.proxy.config;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRebalanceListener;

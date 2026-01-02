@@ -10,7 +10,7 @@
         <relativePath/>
     </parent>
 
-    <groupId>com.um.eventosproxy</groupId>
+    <groupId>com.celi.proxy</groupId>
     <artifactId>proxy</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>Proxy Service</name>
