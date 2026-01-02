@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import com.celi.backend.domain.User;
@@ -84,6 +85,7 @@ public class VentaResource {
      *         ventas resumidas.
      */
     @GetMapping
+    @Transactional(readOnly = true)
     public ResponseEntity<List<VentaResumenDTO>> obtenerVentas() {
         String userLogin = SecurityUtils.getCurrentUserLogin().orElseThrow();
         LOG.debug("REST request para obtener ventas del usuario: {}", userLogin);
@@ -109,6 +111,7 @@ public class VentaResource {
      *         la venta, o con status {@code 404 (Not Found)}.
      */
     @GetMapping("/{id}")
+    @Transactional(readOnly = true)
     public ResponseEntity<VentaResponseDTO> obtenerVenta(@PathVariable Long id) {
         String userLogin = SecurityUtils.getCurrentUserLogin().orElseThrow();
         LOG.debug("REST request para obtener venta id: {}, usuario: {}", id, userLogin);
