@@ -39,6 +39,8 @@ class PurchaseListViewModel(
                         isLoading = false,
                         error = when {
                             e.message?.contains("401") == true -> "Sesión expirada. Por favor inicie sesión nuevamente."
+                            e.message?.contains("500") == true -> "Error interno del servidor al cargar las compras."
+                            e.message?.contains("unexpected json token") == true -> "Error al procesar la respuesta del servidor."
                             e.message?.contains("Network") == true -> "Error de conexión. Verifique su internet."
                             else -> e.message ?: "Error al cargar compras"
                         }
