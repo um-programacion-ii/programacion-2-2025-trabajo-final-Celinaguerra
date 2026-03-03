@@ -1,0 +1,7 @@
+logging:
+  level:
+    root: DEBUG
+    com.celi.proxy: DEBUG
+    org.springframework.kafka: DEBUG
+    org.springframework.data.redis: DEBUG
+

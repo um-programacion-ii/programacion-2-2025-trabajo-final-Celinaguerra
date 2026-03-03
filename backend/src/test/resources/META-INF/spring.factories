@@ -1,0 +1,5 @@
+org.springframework.test.context.ContextCustomizerFactory = \
+    com.celi.backend.config.\
+    SqlTestContainersSpringContextCustomizerFactory,com.celi.backend.\
+    config.TestContainersSpringContextCustomizerFactory,com.celi.backend.\
+    config.KafkaTestContainersSpringContextCustomizerFactory

@@ -1,0 +1,51 @@
+spring:
+  application:
+    name: proxy
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:192.168.194.250:9092}
+    consumer:
+      group-id: ${KAFKA_CONSUMER_GROUP_ID:group-id-celi}
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      enable-auto-commit: true
+    listener:
+      missing-topics-fatal: false
+      auto-startup: true
+  data:
+    redis:
+      host: ${REDIS_HOST:192.168.194.250}
+      port: ${REDIS_PORT:6379}
+      timeout: 2000ms
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+
+server:
+  port: ${SERVER_PORT:8081}
+
+application:
+  backend:
+    base-url: ${BACKEND_BASE_URL:http://localhost:8080}
+    sync-events-path: ${BACKEND_SYNC_EVENTS_PATH:/api/admin/eventos/sincronizar}
+    jwt:
+      secret: ${BACKEND_JWT_SECRET:MjY1NjNlNmM2MDkwMGMxODgxOWYxYjk5NzUwNzhiNGY5ZjY1OTk1NzBiNjdlOGU1MjFkYWVlMTlmMmRhZGI1ZTYwZWM3ZjQ4YjhmZWI1YzNiYzM5ZWExZmI0ODEzOTZmZjc0ZDYwN2M0ODVkYTVhNWM1ZGJhYzE3YTMxZGQ2YTM=}
+      token-validity-in-seconds: 86400
+  catedra:
+    base-url: ${CATEDRA_BASE_URL:http://192.168.194.250:8080}
+    auth-token: ${CATEDRA_AUTH_TOKEN:eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJjZWxpIiwiZXhwIjoxNzY5ODg0ODAyLCJhdXRoIjoiUk9MRV9VU0VSIiwiaWF0IjoxNzY3MjkyODAyfQ.tznP6XFoKxbWGyo9MJknp6jjFXEh501J0Gw5Btw9925957gARI5ct0aPtyCV8sL33EeKR9LdGiXR-sBvsk0ASA}
+  kafka:
+    topic:
+      eventos: ${KAFKA_TOPIC_EVENTOS:eventos-actualizacion}
+
+logging:
+  level:
+    root: INFO
+    com.celi.proxy: DEBUG
+    org.springframework.kafka: INFO
+    org.apache.kafka: WARN
+    org.apache.kafka.clients.consumer: INFO
+    org.apache.kafka.clients.NetworkClient: WARN
+    org.apache.kafka.clients.consumer.internals.ConsumerCoordinator: WARN
